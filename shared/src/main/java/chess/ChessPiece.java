@@ -58,11 +58,55 @@ public class ChessPiece {
         switch (type) {
             case ROOK -> validMoves = getValidMovesRook(board, myPosition);
             case KING -> validMoves = getValidMovesKing(board, myPosition);
+            case BISHOP -> validMoves = getValidMovesBishop(board, myPosition);
         }
         return validMoves;
     }
 
-    public Collection<ChessMove> getValidMovesKing(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> getValidMovesBishop(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        int column = myPosition.getColumn();
+        int row = myPosition.getRow();
+
+        int[][] directions = {
+                {-1,-1},
+                {1,-1},
+                {-1,1},
+                {1,1},
+        };
+
+        for (int[] direction : directions) {
+            int rowOffset = direction[0];
+            int colOffset = direction[1];
+            int newRow = row;
+            int newCol = column;
+
+            while (true) {
+                newRow += rowOffset;
+                newCol += colOffset;
+
+                if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) break;
+
+                ChessPosition new_position = new ChessPosition(newRow, newCol);
+
+                if (board.getPiece(new_position) == null) {
+                    validMoves.add(new ChessMove(myPosition, new_position, null));
+                } else if (board.getPiece(new_position).getTeamColor() == pieceColor) {
+                    System.out.println("Teammate here. Cannot move");
+                    break;
+                } else {
+                    validMoves.add(new ChessMove(myPosition, new_position, null));
+                    System.out.println("Captured Piece!");
+                    break;
+                }
+
+            }
+        }
+
+        return validMoves;
+    }
+
+    private Collection<ChessMove> getValidMovesKing(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
         int row = myPosition.getRow();
@@ -100,7 +144,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    public Collection<ChessMove> getValidMovesRook(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> getValidMovesRook(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
         int row = myPosition.getRow();
