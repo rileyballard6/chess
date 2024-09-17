@@ -54,19 +54,50 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        System.out.println("I am piece type: " + type);
         Collection<ChessMove> validMoves = new ArrayList<>();
-        if (type == PieceType.ROOK) {
-            validMoves = getValidMovesRook(board, myPosition);
+        switch (type) {
+            case ROOK -> validMoves = getValidMovesRook(board, myPosition);
+            case KING -> validMoves = getValidMovesKing(board, myPosition);
         }
         return validMoves;
-        throw new RuntimeException("Not implemented");
+    }
+
+    public Collection<ChessMove> getValidMovesKing(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        int column = myPosition.getColumn();
+        int row = myPosition.getRow();
+        return validMoves;
     }
 
     public Collection<ChessMove> getValidMovesRook(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
         int row = myPosition.getRow();
+        for (int i = row; i > 0; i--) {
+            ChessPosition new_position = new ChessPosition(i, column);
+            if (board.getPiece(new_position) == null) {
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+            }
+        }
+        for (int i = row; i <= 8; i++) {
+            ChessPosition new_position = new ChessPosition(i, column);
+            if (board.getPiece(new_position) == null) {
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+            }
+        }
+        for (int i = column; i <= 8; i++) {
+            ChessPosition new_position = new ChessPosition(row, i);
+            if (board.getPiece(new_position) == null) {
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+            }
+        }
+        for (int i = column; i > 0; i--) {
+            ChessPosition new_position = new ChessPosition(row, i);
+            if (board.getPiece(new_position) == null) {
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+            }
+        }
+        return validMoves;
     }
 
     @Override
