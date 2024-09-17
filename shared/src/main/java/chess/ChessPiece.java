@@ -59,7 +59,28 @@ public class ChessPiece {
             case ROOK -> validMoves = getValidMovesRook(board, myPosition);
             case KING -> validMoves = getValidMovesKing(board, myPosition);
             case BISHOP -> validMoves = getValidMovesBishop(board, myPosition);
+            case QUEEN -> validMoves = getValidMovesQueen(board, myPosition);
         }
+        return validMoves;
+    }
+
+    private Collection<ChessMove> getValidMovesQueen(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        int column = myPosition.getColumn();
+        int row = myPosition.getRow();
+
+        int[][] directions = {
+                {-1,0},
+                {1,0},
+                {0,1},
+                {0,-1},
+                {-1,-1},
+                {1,-1},
+                {-1,1},
+                {1,1},
+        };
+
+        pieceLoopMultipleMoves(board, myPosition, row, column, directions, validMoves);
         return validMoves;
     }
 
