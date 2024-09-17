@@ -57,13 +57,23 @@ public class ChessPiece {
         Collection<ChessMove> validMoves = new ArrayList<>();
         switch (type) {
             // supply the getValidMoves function with board, position, a list of the directions the piece can move, and
-            // whether it can move multiple tiles.
+            // whether it can move multiple tiles. Pawn gets its own function because it is annoying and stinks!
             case ROOK -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1, 0}, {1, 0}, {0, 1}, {0, -1}}, true);
             case KING -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1,0}, {1,0}, {0,1}, {0,-1}, {-1,-1}, {1,-1}, {-1,1}, {1,1},}, false );
             case BISHOP -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1,-1}, {1,-1}, {-1,1}, {1,1},}, true);
             case QUEEN -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1,0}, {1,0}, {0,1}, {0,-1}, {-1,-1}, {1,-1}, {-1,1}, {1,1},}, true);
             case KNIGHT -> validMoves = getValidMoves(board, myPosition, new int[][] {{1,2}, {1,-2}, {2,1}, {2, -1}, {-2,1}, {-2,-1}, {-1, 2}, {-1, -2}}, false);
+            case PAWN -> validMoves = getValidMovesPawn(board, myPosition);
         }
+        return validMoves;
+    }
+
+    private Collection<ChessMove> getValidMovesPawn(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        int column = myPosition.getColumn();
+        int row = myPosition.getRow();
+
+
         return validMoves;
     }
 
@@ -83,7 +93,7 @@ public class ChessPiece {
     }
 
     //loop over each direction and while the condition is true, add that direction to the newRow and newCol to make a new position
-    //Check if the position if occupied, if not, add it, if so, check if it is your piece or opponent.
+    //Check if the position is occupied, if not, add ChessMove, if so, check if it is your piece or opponent to add or break
     private void pieceLoopMultipleMoves(ChessBoard board, ChessPosition myPosition, int row, int column, int[][] directions, Collection<ChessMove> validMoves) {
         for (int[] direction : directions) {
             int rowOffset = direction[0];
