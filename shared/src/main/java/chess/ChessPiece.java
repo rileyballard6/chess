@@ -56,43 +56,18 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         switch (type) {
-            case ROOK -> validMoves = getValidMoves(board, myPosition, new int[][] {
-                    {-1, 0},
-                    {1, 0},
-                    {0, 1},
-                    {0, -1}
-            }, true);
-            case KING -> validMoves = getValidMoves(board, myPosition, new int[][] {
-                    {-1,0},
-                    {1,0},
-                    {0,1},
-                    {0,-1},
-                    {-1,-1},
-                    {1,-1},
-                    {-1,1},
-                    {1,1},
-            }, false );
-            case BISHOP -> validMoves = getValidMoves(board, myPosition, new int[][] {
-                    {-1,-1},
-                    {1,-1},
-                    {-1,1},
-                    {1,1},
-            }, true);
-            case QUEEN -> validMoves = getValidMoves(board, myPosition, new int[][] {
-                    {-1,0},
-                    {1,0},
-                    {0,1},
-                    {0,-1},
-                    {-1,-1},
-                    {1,-1},
-                    {-1,1},
-                    {1,1},
-            }, true);
+            // supply the getValidMoves function with board, position, a list of the directions the piece can move, and
+            // whether it can move multiple tiles.
+            case ROOK -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1, 0}, {1, 0}, {0, 1}, {0, -1}}, true);
+            case KING -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1,0}, {1,0}, {0,1}, {0,-1}, {-1,-1}, {1,-1}, {-1,1}, {1,1},}, false );
+            case BISHOP -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1,-1}, {1,-1}, {-1,1}, {1,1},}, true);
+            case QUEEN -> validMoves = getValidMoves(board, myPosition, new int[][] {{-1,0}, {1,0}, {0,1}, {0,-1}, {-1,-1}, {1,-1}, {-1,1}, {1,1},}, true);
             case KNIGHT -> validMoves = getValidMoves(board, myPosition, new int[][] {{1,2}, {1,-2}, {2,1}, {2, -1}, {-2,1}, {-2,-1}, {-1, 2}, {-1, -2}}, false);
         }
         return validMoves;
     }
 
+    // returns the validMoves to the main function. Gets the initial row and column of the piece to pass into the loop function.
     private Collection<ChessMove> getValidMoves(ChessBoard board, ChessPosition myPosition, int[][] directions, boolean loop) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
@@ -107,6 +82,8 @@ public class ChessPiece {
         return validMoves;
     }
 
+    //loop over each direction and while the condition is true, add that direction to the newRow and newCol to make a new position
+    //Check if the position if occupied, if not, add it, if so, check if it is your piece or opponent.
     private void pieceLoopMultipleMoves(ChessBoard board, ChessPosition myPosition, int row, int column, int[][] directions, Collection<ChessMove> validMoves) {
         for (int[] direction : directions) {
             int rowOffset = direction[0];
@@ -136,6 +113,7 @@ public class ChessPiece {
         }
     }
 
+    // Same as the above loop but dont need "while true" since these pieces can only move once
     private void pieceLoopOneMove(ChessBoard board, ChessPosition myPosition, int row, int column, int[][] directions, Collection<ChessMove> validMoves) {
         for (int[] direction : directions) {
             int rowOffset = direction[0];
