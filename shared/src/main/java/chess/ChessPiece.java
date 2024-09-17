@@ -75,34 +75,7 @@ public class ChessPiece {
                 {1,1},
         };
 
-        for (int[] direction : directions) {
-            int rowOffset = direction[0];
-            int colOffset = direction[1];
-            int newRow = row;
-            int newCol = column;
-
-            while (true) {
-                newRow += rowOffset;
-                newCol += colOffset;
-
-                if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) break;
-
-                ChessPosition new_position = new ChessPosition(newRow, newCol);
-
-                if (board.getPiece(new_position) == null) {
-                    validMoves.add(new ChessMove(myPosition, new_position, null));
-                } else if (board.getPiece(new_position).getTeamColor() == pieceColor) {
-                    System.out.println("Teammate here. Cannot move");
-                    break;
-                } else {
-                    validMoves.add(new ChessMove(myPosition, new_position, null));
-                    System.out.println("Captured Piece!");
-                    break;
-                }
-
-            }
-        }
-
+        pieceLoopMultipleMoves(board, myPosition, row, column, directions, validMoves);
         return validMoves;
     }
 
@@ -155,7 +128,11 @@ public class ChessPiece {
                 {0, 1},
                 {0, -1}
         };
+        pieceLoopMultipleMoves(board, myPosition, row, column, directions, validMoves);
+        return validMoves;
+    }
 
+    private void pieceLoopMultipleMoves(ChessBoard board, ChessPosition myPosition, int row, int column, int[][] directions, Collection<ChessMove> validMoves) {
         for (int[] direction : directions) {
             int rowOffset = direction[0];
             int colOffset = direction[1];
@@ -182,8 +159,6 @@ public class ChessPiece {
                 }
             }
         }
-
-        return validMoves;
     }
 
     @Override
