@@ -36,7 +36,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
@@ -66,6 +66,37 @@ public class ChessPiece {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
         int row = myPosition.getRow();
+
+        int[][] directions = {
+                {-1,0},
+                {1,0},
+                {0,1},
+                {0,-1},
+                {-1,-1},
+                {1,-1},
+                {-1,1},
+                {1,1},
+        };
+
+        for (int[] direction : directions) {
+            int rowOffset = direction[0];
+            int colOffset = direction[1];
+            int newRow = row + rowOffset;
+            int newCol = column + colOffset;
+
+            if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) break;
+            ChessPosition new_position = new ChessPosition(newRow, newCol);
+
+            if (board.getPiece(new_position) == null) {
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+            } else if (board.getPiece(new_position).getTeamColor() == pieceColor) {
+                System.out.println("Teammate here. Cannot move.");
+            } else {
+                System.out.println("Piece captured!");
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+            }
+
+        }
         return validMoves;
     }
 
@@ -73,30 +104,41 @@ public class ChessPiece {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
         int row = myPosition.getRow();
-        for (int i = row; i > 0; i--) {
-            ChessPosition new_position = new ChessPosition(i, column);
-            if (board.getPiece(new_position) == null) {
-                validMoves.add(new ChessMove(myPosition, new_position, null));
+
+        int[][] directions = {
+                {-1, 0},
+                {1, 0},
+                {0, 1},
+                {0, -1}
+        };
+
+        for (int[] direction : directions) {
+            int rowOffset = direction[0];
+            int colOffset = direction[1];
+            int newRow = row;
+            int newCol = column;
+
+            while (true) {
+                newRow += rowOffset;
+                newCol += colOffset;
+
+                if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) break;
+
+                ChessPosition new_position = new ChessPosition(newRow, newCol);
+
+                if (board.getPiece(new_position) == null) {
+                    validMoves.add(new ChessMove(myPosition, new_position, null));
+                } else if (board.getPiece(new_position).getTeamColor() == pieceColor) {
+                    System.out.println("Teammate here. Cannot move");
+                    break;
+                } else {
+                    validMoves.add(new ChessMove(myPosition, new_position, null));
+                    System.out.println("Captured Piece!");
+                    break;
+                }
             }
         }
-        for (int i = row; i <= 8; i++) {
-            ChessPosition new_position = new ChessPosition(i, column);
-            if (board.getPiece(new_position) == null) {
-                validMoves.add(new ChessMove(myPosition, new_position, null));
-            }
-        }
-        for (int i = column; i <= 8; i++) {
-            ChessPosition new_position = new ChessPosition(row, i);
-            if (board.getPiece(new_position) == null) {
-                validMoves.add(new ChessMove(myPosition, new_position, null));
-            }
-        }
-        for (int i = column; i > 0; i--) {
-            ChessPosition new_position = new ChessPosition(row, i);
-            if (board.getPiece(new_position) == null) {
-                validMoves.add(new ChessMove(myPosition, new_position, null));
-            }
-        }
+
         return validMoves;
     }
 
