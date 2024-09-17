@@ -88,6 +88,7 @@ public class ChessPiece {
                     {-1,1},
                     {1,1},
             }, true);
+            case KNIGHT -> validMoves = getValidMoves(board, myPosition, new int[][] {{1,2}, {1,-2}, {2,1}, {2, -1}, {-2,1}, {-2,-1}, {-1, 2}, {-1, -2}}, false);
         }
         return validMoves;
     }
@@ -142,7 +143,7 @@ public class ChessPiece {
             int newRow = row + rowOffset;
             int newCol = column + colOffset;
 
-            if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) break;
+            if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) continue;
             ChessPosition new_position = new ChessPosition(newRow, newCol);
 
             if (board.getPiece(new_position) == null) {
