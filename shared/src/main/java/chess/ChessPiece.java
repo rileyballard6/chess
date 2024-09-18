@@ -219,4 +219,16 @@ public class ChessPiece {
                 "," + type +
                 '}';
     }
+
+    public String stringLetter() {
+        switch (type) {
+            case KNIGHT: {return pieceColor == ChessGame.TeamColor.WHITE ? "N" : "n";}
+            case QUEEN: {return pieceColor == ChessGame.TeamColor.WHITE ? "Q" : "q";}
+            case KING: {return pieceColor == ChessGame.TeamColor.WHITE ? "K" : "k";}
+            case PAWN: {return pieceColor == ChessGame.TeamColor.WHITE ? "P" : "p";}
+            case BISHOP: {return pieceColor == ChessGame.TeamColor.WHITE ? "B" : "b";}
+            case ROOK: {return pieceColor == ChessGame.TeamColor.WHITE ? "R" : "r";}
+        }
+        return "";
+    }
 }
