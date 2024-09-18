@@ -72,9 +72,77 @@ public class ChessPiece {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int column = myPosition.getColumn();
         int row = myPosition.getRow();
+        int[][] whiteDirections = {{1,0}};
+        int[][] blackDirections = {{-1,0}};
+        if (pieceColor == ChessGame.TeamColor.WHITE) {
+            pawnLoopMoves(board, myPosition, row,column, whiteDirections, validMoves, 2, 8, ChessGame.TeamColor.BLACK);
+        } else {
+            pawnLoopMoves(board, myPosition, row,column, blackDirections, validMoves, -2, 1, ChessGame.TeamColor.WHITE);
 
-
+        }
         return validMoves;
+    }
+
+    private void pawnLoopMoves(ChessBoard board, ChessPosition myPosition, int row, int column, int[][] directions, Collection<ChessMove> validMoves, int doubleJump, int edge, ChessGame.TeamColor enemyTeam) {
+        for (int[] direction : directions) {
+            int rowOffset = direction[0];
+            int columnOffset = direction[1];
+            int newRow = row + rowOffset;
+            int newRowDouble = row + doubleJump;
+            int newCol = column + columnOffset;
+            int start = enemyTeam == ChessGame.TeamColor.BLACK ? 2 : 7;
+
+            ChessPosition new_position = new ChessPosition(newRow, newCol);
+            ChessPosition double_position = new ChessPosition(newRowDouble, newCol);
+
+            if (newRow <= 0 || newRow > 8 || newCol <= 0 || newCol > 8) break;
+
+            if (board.getPiece(new_position) == null && newRow == edge) {
+                validMoves.add(new ChessMove(myPosition, new_position, PieceType.QUEEN));
+                validMoves.add(new ChessMove(myPosition, new_position, PieceType.BISHOP));
+                validMoves.add(new ChessMove(myPosition, new_position, PieceType.ROOK));
+                validMoves.add(new ChessMove(myPosition, new_position, PieceType.KNIGHT));
+            } else if (board.getPiece(new_position) == null) {
+                validMoves.add(new ChessMove(myPosition, new_position, null));
+                if (row == start && board.getPiece(double_position) == null) {
+                    validMoves.add(new ChessMove(myPosition, double_position, null));
+                }
+            }
+
+
+
+            ChessPosition left_capture = new ChessPosition(newRow, newCol - 1);
+            ChessPiece left_chesspiece = board.getPiece(left_capture);
+            if (left_chesspiece != null) {
+                if (left_chesspiece.pieceColor == enemyTeam) {
+                    if (newRow == edge) {
+                        validMoves.add(new ChessMove(myPosition, left_capture, PieceType.QUEEN));
+                        validMoves.add(new ChessMove(myPosition, left_capture, PieceType.BISHOP));
+                        validMoves.add(new ChessMove(myPosition, left_capture, PieceType.ROOK));
+                        validMoves.add(new ChessMove(myPosition, left_capture, PieceType.KNIGHT));
+                    } else {
+                        validMoves.add(new ChessMove(myPosition, left_capture, null));
+                    }
+                }
+            }
+
+            ChessPosition right_capture = new ChessPosition(newRow, newCol + 1);
+            ChessPiece right_chesspiece = board.getPiece(right_capture);
+            if (right_chesspiece != null) {
+                if (right_chesspiece.pieceColor == enemyTeam) {
+                    if (newRow == edge) {
+                        validMoves.add(new ChessMove(myPosition, right_capture, PieceType.QUEEN));
+                        validMoves.add(new ChessMove(myPosition, right_capture, PieceType.BISHOP));
+                        validMoves.add(new ChessMove(myPosition, right_capture, PieceType.ROOK));
+                        validMoves.add(new ChessMove(myPosition, right_capture, PieceType.KNIGHT));
+                    } else {
+                        validMoves.add(new ChessMove(myPosition, right_capture, null));
+                    }
+
+                }
+            }
+
+        }
     }
 
     // returns the validMoves to the main function. Gets the initial row and column of the piece to pass into the loop function.
