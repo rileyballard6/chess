@@ -112,17 +112,17 @@ public class ChessPiece {
             }
 
             for (int capture : captures) {
-                ChessPosition left_capture = new ChessPosition(newRow, newCol + capture);
-                ChessPiece left_chesspiece = board.getPiece(left_capture);
-                if (left_chesspiece != null) {
-                    if (left_chesspiece.pieceColor == enemyTeam) {
+                ChessPosition capturedPiece = new ChessPosition(newRow, newCol + capture);
+                ChessPiece chesspiece = board.getPiece(capturedPiece);
+                if (chesspiece != null) {
+                    if (chesspiece.pieceColor == enemyTeam) {
                         if (newRow == edge) {
-                            validMoves.add(new ChessMove(myPosition, left_capture, PieceType.QUEEN));
-                            validMoves.add(new ChessMove(myPosition, left_capture, PieceType.BISHOP));
-                            validMoves.add(new ChessMove(myPosition, left_capture, PieceType.ROOK));
-                            validMoves.add(new ChessMove(myPosition, left_capture, PieceType.KNIGHT));
+                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.QUEEN));
+                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.BISHOP));
+                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.ROOK));
+                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.KNIGHT));
                         } else {
-                            validMoves.add(new ChessMove(myPosition, left_capture, null));
+                            validMoves.add(new ChessMove(myPosition, capturedPiece, null));
                         }
                     }
                 }
