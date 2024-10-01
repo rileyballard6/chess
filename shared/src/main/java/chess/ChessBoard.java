@@ -67,6 +67,19 @@ public class ChessBoard {
         }
 
     }
+    public ChessBoard copy() {
+        ChessBoard newBoard = new ChessBoard();
+        // Deep copy the board array
+        newBoard.chessboard = new ChessPiece[9][9]; // assuming standard chessboard size
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                if (this.chessboard[i][j] != null) {
+                    newBoard.chessboard[i][j] = this.chessboard[i][j].copy(); // assuming Piece has a copy method
+                }
+            }
+        }
+        return newBoard;
+    }
 
     @Override
     public String toString() {

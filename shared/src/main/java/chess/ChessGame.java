@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ public class ChessGame {
     public ChessGame() {
         this.chessboard = new ChessBoard();
         chessboard.resetBoard();
+        teamTurn = TeamColor.WHITE;
     }
 
     /**
@@ -43,6 +45,25 @@ public class ChessGame {
         BLACK
     }
 
+    //Create a copy of the board for each move, and after the move, see if it is in check or not. If not, add the move to the real valid Moves.
+    private Collection<ChessMove> getValidMovesCheck(Collection<ChessMove> moves, ChessPosition position, ChessPiece piece) {
+        Collection<ChessMove> validCheckMoves = new ArrayList<>();
+        TeamColor turn = piece.getTeamColor();
+        for (ChessMove move : moves) {
+            ChessGame testGame = new ChessGame();
+            ChessBoard copyBoard = chessboard.copy();
+            testGame.setBoard(copyBoard);
+            testGame.setTeamTurn(turn);
+            try {testGame.makeMove(move);} catch (Exception e) {System.out.println(e);}
+            if (!testGame.isInCheck(turn)) {
+                System.out.println("King is not in check");
+                validCheckMoves.add(move);
+            }
+        }
+//
+        return validCheckMoves;
+    };
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -51,13 +72,27 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        System.out.println(isInCheck(TeamColor.WHITE));
         ChessPiece piece = chessboard.getPiece(startPosition);
-        if (piece == null) {
-            return null;
+        Collection<ChessMove> validMoves = piece.pieceMoves(chessboard, startPosition);
+        Collection<ChessMove> finalMoves = new ArrayList<>();
+        if (isInCheck(chessboard.getPiece(startPosition).getTeamColor())) {
+            return getValidMovesCheck(validMoves, startPosition, piece);
         } else {
-            return piece.pieceMoves(chessboard, startPosition);
+            TeamColor turn = piece.getTeamColor();
+            for (ChessMove move : validMoves) {
+                ChessGame testGame = new ChessGame();
+                ChessBoard copyBoard = chessboard.copy();
+                testGame.setBoard(copyBoard);
+                testGame.setTeamTurn(turn);
+                try {testGame.makeMove(move);} catch (Exception e) {System.out.println(e);}
+                if (!testGame.isInCheck(turn)) {
+                    finalMoves.add(move);
+                }
+            }
         }
+        System.out.println(finalMoves);
+        return finalMoves;
+//        return getValidMovesCheck(validMoves, startPosition, piece)
     }
 
     /**
@@ -69,6 +104,9 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (chessboard.getPiece(move.getStartPosition()) == null) {
             throw new InvalidMoveException("No piece here.");
+        }
+        if (chessboard.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Not your turn.");
         }
         ChessPiece piece = chessboard.getPiece(move.getStartPosition());
         Collection<ChessMove> validMoves = piece.pieceMoves(chessboard, move.getStartPosition());
@@ -120,8 +158,8 @@ public class ChessGame {
     //Loop through the board and find the teamColor king, return his position
     private ChessPosition findKing(TeamColor teamColor) {
         ChessPosition KingPosition = null;
-        for (int i = 1; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 ChessPosition newPosition = new ChessPosition(i, j);
                 ChessPiece piece = chessboard.getPiece(newPosition);
                 if (piece != null) {
@@ -138,8 +176,8 @@ public class ChessGame {
     //Loop through the board and return a map of enemy positions, and the pieces there.
     private HashMap<ChessPosition, ChessPiece> getEnemyPieces(TeamColor teamColor) {
         HashMap<ChessPosition, ChessPiece> enemyPieces = new HashMap<>();
-        for (int i = 1; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 ChessPosition newPosition = new ChessPosition(i, j);
                 ChessPiece piece = chessboard.getPiece(newPosition);
                 if (piece != null) {
@@ -165,9 +203,7 @@ public class ChessGame {
             ChessPiece King = chessboard.getPiece(kingPosition);
             Collection<ChessMove> validMoves = King.pieceMoves(chessboard, kingPosition);
             HashMap<ChessPosition, ChessPiece> map = getEnemyPieces(teamColor);
-            if (validMoves.isEmpty()) {
-                return true;
-            }
+            return validMoves.isEmpty();
         }
         return false;
     }

@@ -20,6 +20,10 @@ public class ChessPiece {
         this.type = type;
     }
 
+    public ChessPiece copy() {
+        return new ChessPiece(pieceColor, type);
+    }
+
     /**
      * The various different chess piece options
      */
@@ -166,11 +170,9 @@ public class ChessPiece {
                 if (board.getPiece(new_position) == null) {
                     validMoves.add(new ChessMove(myPosition, new_position, null));
                 } else if (board.getPiece(new_position).getTeamColor() == pieceColor) {
-                    System.out.println("Teammate here. Cannot move");
                     break;
                 } else {
                     validMoves.add(new ChessMove(myPosition, new_position, null));
-                    System.out.println("Captured Piece!");
                     break;
                 }
             }
@@ -191,9 +193,7 @@ public class ChessPiece {
             if (board.getPiece(new_position) == null) {
                 validMoves.add(new ChessMove(myPosition, new_position, null));
             } else if (board.getPiece(new_position).getTeamColor() == pieceColor) {
-                System.out.println("Teammate here. Cannot move.");
             } else {
-                System.out.println("Piece captured!");
                 validMoves.add(new ChessMove(myPosition, new_position, null));
             }
 
