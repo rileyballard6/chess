@@ -15,7 +15,7 @@ public class ChessGame {
     private TeamColor teamTurn;
 
     public ChessGame() {
-
+        this.chessboard = new ChessBoard();
     }
 
     /**
@@ -66,10 +66,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece piece = chessboard.getPiece(move.getStartPosition());
-        if (piece == null) {
+        if (chessboard.getPiece(move.getStartPosition()) == null) {
             throw new InvalidMoveException("No piece here.");
         }
+        ChessPiece piece = chessboard.getPiece(move.getStartPosition());
         Collection<ChessMove> validMoves = piece.pieceMoves(chessboard, move.getStartPosition());
         boolean isValidMove = false;
         for (ChessMove iterator : validMoves) {
