@@ -50,6 +50,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        System.out.println(isInCheck(TeamColor.BLACK));
         ChessPiece piece = chessboard.getPiece(startPosition);
         if (piece == null) {
             return null;
@@ -75,15 +76,16 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPiece King = null;
-        HashMap<ChessPosition, ChessPiece> map = null;
+        ChessPosition KingPosition = null;
+        HashMap<ChessPosition, ChessPiece> map = new HashMap<>();
+        //Loop through all the pieces on the board and assign the kings position and piece.
         for (int i = 1; i < 8; i++) {
             for (int j = 1; j < 8; j++) {
                 ChessPosition newPosition = new ChessPosition(i, j);
                 ChessPiece piece = chessboard.getPiece(newPosition);
                 if (piece != null) {
                     if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                        King = piece;
+                        KingPosition = newPosition;
                     } else if (piece.getTeamColor() != teamColor) {
                         map.put(newPosition, piece);
                     }
@@ -91,9 +93,16 @@ public class ChessGame {
 
             }
         }
-
-        System.out.println(King);
-        return true;
+        //Loop through the hashmap and get a collection of the moves they could use, if the king is in the endPosition, return true
+        for (HashMap.Entry<ChessPosition, ChessPiece> entry : map.entrySet() ) {
+            Collection<ChessMove> chessMoves = entry.getValue().pieceMoves(chessboard, entry.getKey());
+            for (ChessMove iterator : chessMoves) {
+                if (iterator.getEndPosition().equals(KingPosition)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
