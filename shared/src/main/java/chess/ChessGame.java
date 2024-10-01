@@ -242,6 +242,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (isInCheckmate(teamColor)) {
+            return false;
+        }
         HashMap<ChessPosition, ChessPiece> teamPieces = getTeamPieces(teamColor);
         for (HashMap.Entry<ChessPosition, ChessPiece> entry : teamPieces.entrySet()) {
             Collection<ChessMove> validMoves = validMoves(entry.getKey());
