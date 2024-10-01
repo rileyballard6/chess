@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -73,7 +75,25 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece King = null;
+        HashMap<ChessPosition, ChessPiece> map = null;
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; j < 8; j++) {
+                ChessPosition newPosition = new ChessPosition(i, j);
+                ChessPiece piece = chessboard.getPiece(newPosition);
+                if (piece != null) {
+                    if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                        King = piece;
+                    } else if (piece.getTeamColor() != teamColor) {
+                        map.put(newPosition, piece);
+                    }
+                }
+
+            }
+        }
+
+        System.out.println(King);
+        return true;
     }
 
     /**
