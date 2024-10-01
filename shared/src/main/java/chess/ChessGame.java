@@ -50,7 +50,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        System.out.println(isInCheck(TeamColor.BLACK));
+        System.out.println(isInCheck(TeamColor.WHITE));
         ChessPiece piece = chessboard.getPiece(startPosition);
         if (piece == null) {
             return null;
@@ -76,23 +76,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition KingPosition = null;
-        HashMap<ChessPosition, ChessPiece> map = new HashMap<>();
-        //Loop through all the pieces on the board and assign the kings position and piece.
-        for (int i = 1; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
-                ChessPosition newPosition = new ChessPosition(i, j);
-                ChessPiece piece = chessboard.getPiece(newPosition);
-                if (piece != null) {
-                    if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                        KingPosition = newPosition;
-                    } else if (piece.getTeamColor() != teamColor) {
-                        map.put(newPosition, piece);
-                    }
-                }
-
-            }
-        }
+        ChessPosition KingPosition = findKing(teamColor);
+        HashMap<ChessPosition, ChessPiece> map = getEnemyPieces(teamColor);
         //Loop through the hashmap and get a collection of the moves they could use, if the king is in the endPosition, return true
         for (HashMap.Entry<ChessPosition, ChessPiece> entry : map.entrySet() ) {
             Collection<ChessMove> chessMoves = entry.getValue().pieceMoves(chessboard, entry.getKey());
@@ -103,6 +88,40 @@ public class ChessGame {
             }
         }
         return false;
+    }
+
+    private ChessPosition findKing(TeamColor teamColor) {
+        ChessPosition KingPosition = null;
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; j < 8; j++) {
+                ChessPosition newPosition = new ChessPosition(i, j);
+                ChessPiece piece = chessboard.getPiece(newPosition);
+                if (piece != null) {
+                    if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                        KingPosition = newPosition;
+                    }
+                }
+
+            }
+        }
+        return KingPosition;
+    }
+
+    private HashMap<ChessPosition, ChessPiece> getEnemyPieces(TeamColor teamColor) {
+        HashMap<ChessPosition, ChessPiece> enemyPieces = new HashMap<>();
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; j < 8; j++) {
+                ChessPosition newPosition = new ChessPosition(i, j);
+                ChessPiece piece = chessboard.getPiece(newPosition);
+                if (piece != null) {
+                     if (piece.getTeamColor() != teamColor) {
+                        enemyPieces.put(newPosition, piece);
+                    }
+                }
+
+            }
+        }
+        return enemyPieces;
     }
 
     /**
