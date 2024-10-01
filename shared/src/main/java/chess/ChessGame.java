@@ -75,6 +75,7 @@ public class ChessGame {
         for (ChessMove iterator : validMoves) {
             if (iterator.getEndPosition().equals(move.getEndPosition())) {
                 isValidMove = true;
+                break;
             }
         }
         if (isValidMove) {
@@ -86,6 +87,7 @@ public class ChessGame {
             } else {
                 chessboard.addPiece(move.getEndPosition(), piece);
             }
+            setTeamTurn(teamTurn == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK);
         } else {
             throw new InvalidMoveException("Invalid Move!! Not in collection");
         }
