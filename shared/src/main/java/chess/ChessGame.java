@@ -79,7 +79,13 @@ public class ChessGame {
         }
         if (isValidMove) {
             chessboard.RemovePiece(move.getStartPosition());
-            chessboard.addPiece(move.getEndPosition(), piece);
+            if (move.getPromotionPiece() != null) {
+                TeamColor color = teamTurn == TeamColor.BLACK ? TeamColor.BLACK : TeamColor.WHITE;
+                ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
+                chessboard.addPiece(move.getEndPosition(), promotionPiece);
+            } else {
+                chessboard.addPiece(move.getEndPosition(), piece);
+            }
         } else {
             throw new InvalidMoveException("Invalid Move!! Not in collection");
         }
