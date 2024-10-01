@@ -66,7 +66,24 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = chessboard.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException("No piece here.");
+        }
+        Collection<ChessMove> validMoves = piece.pieceMoves(chessboard, move.getStartPosition());
+        boolean isValidMove = false;
+        for (ChessMove iterator : validMoves) {
+            if (iterator.getEndPosition().equals(move.getEndPosition())) {
+                isValidMove = true;
+            }
+        }
+        if (isValidMove) {
+            chessboard.RemovePiece(move.getStartPosition());
+            chessboard.addPiece(move.getEndPosition(), piece);
+        } else {
+            throw new InvalidMoveException("Invalid Move!! Not in collection");
+        }
+
     }
 
     /**
@@ -78,6 +95,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition KingPosition = findKing(teamColor);
         HashMap<ChessPosition, ChessPiece> map = getEnemyPieces(teamColor);
+
         //Loop through the hashmap and get a collection of the moves they could use, if the king is in the endPosition, return true
         for (HashMap.Entry<ChessPosition, ChessPiece> entry : map.entrySet() ) {
             Collection<ChessMove> chessMoves = entry.getValue().pieceMoves(chessboard, entry.getKey());
@@ -90,6 +108,7 @@ public class ChessGame {
         return false;
     }
 
+    //Loop through the board and find the teamColor king, return his position
     private ChessPosition findKing(TeamColor teamColor) {
         ChessPosition KingPosition = null;
         for (int i = 1; i < 8; i++) {
@@ -107,6 +126,7 @@ public class ChessGame {
         return KingPosition;
     }
 
+    //Loop through the board and return a map of enemy positions, and the pieces there.
     private HashMap<ChessPosition, ChessPiece> getEnemyPieces(TeamColor teamColor) {
         HashMap<ChessPosition, ChessPiece> enemyPieces = new HashMap<>();
         for (int i = 1; i < 8; i++) {
@@ -131,7 +151,16 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            ChessPosition kingPosition = findKing(teamColor);
+            ChessPiece King = chessboard.getPiece(kingPosition);
+            Collection<ChessMove> validMoves = King.pieceMoves(chessboard, kingPosition);
+            HashMap<ChessPosition, ChessPiece> map = getEnemyPieces(teamColor);
+            if (validMoves.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
