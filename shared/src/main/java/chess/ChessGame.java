@@ -9,6 +9,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    private ChessBoard chessboard;
+    private TeamColor teamColor;
 
     public ChessGame() {
 
@@ -27,7 +29,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        this.teamColor = team;
     }
 
     /**
@@ -46,7 +48,12 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = chessboard.getPiece(startPosition);
+        if (piece == null) {
+            return null;
+        } else {
+            return piece.pieceMoves(chessboard, startPosition);
+        }
     }
 
     /**
@@ -96,7 +103,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.chessboard = board;
     }
 
     /**
@@ -105,6 +112,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return chessboard;
     }
 }
