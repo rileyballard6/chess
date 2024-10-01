@@ -46,7 +46,7 @@ public class ChessGame {
     }
 
     //Create a copy of the board for each move, and after the move, see if it is in check or not. If not, add the move to the real valid Moves.
-    private Collection<ChessMove> getValidMovesCheck(Collection<ChessMove> moves, ChessPosition position, ChessPiece piece) {
+    private Collection<ChessMove> getValidMovesCheck(Collection<ChessMove> moves, ChessPiece piece) {
         Collection<ChessMove> validCheckMoves = new ArrayList<>();
         TeamColor turn = piece.getTeamColor();
         for (ChessMove move : moves) {
@@ -76,7 +76,7 @@ public class ChessGame {
         Collection<ChessMove> validMoves = piece.pieceMoves(chessboard, startPosition);
         Collection<ChessMove> finalMoves = new ArrayList<>();
         if (isInCheck(chessboard.getPiece(startPosition).getTeamColor())) {
-            return getValidMovesCheck(validMoves, startPosition, piece);
+            return getValidMovesCheck(validMoves, piece);
         } else {
             TeamColor turn = piece.getTeamColor();
             for (ChessMove move : validMoves) {
@@ -125,6 +125,9 @@ public class ChessGame {
                 chessboard.addPiece(move.getEndPosition(), promotionPiece);
             } else {
                 chessboard.addPiece(move.getEndPosition(), piece);
+            }
+            if (isInCheck(teamTurn)) {
+                throw new InvalidMoveException("Cannot move a piece into check.");
             }
             setTeamTurn(teamTurn == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK);
         } else {
@@ -191,6 +194,24 @@ public class ChessGame {
         return enemyPieces;
     }
 
+    //Loop through the board and return a map of enemy positions, and the pieces there.
+    private HashMap<ChessPosition, ChessPiece> getTeamPieces(TeamColor teamColor) {
+        HashMap<ChessPosition, ChessPiece> teamPieces = new HashMap<>();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition newPosition = new ChessPosition(i, j);
+                ChessPiece piece = chessboard.getPiece(newPosition);
+                if (piece != null) {
+                    if (piece.getTeamColor() == teamColor) {
+                        teamPieces.put(newPosition, piece);
+                    }
+                }
+
+            }
+        }
+        return teamPieces;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -199,13 +220,18 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (isInCheck(teamColor)) {
-            ChessPosition kingPosition = findKing(teamColor);
-            ChessPiece King = chessboard.getPiece(kingPosition);
-            Collection<ChessMove> validMoves = King.pieceMoves(chessboard, kingPosition);
-            HashMap<ChessPosition, ChessPiece> map = getEnemyPieces(teamColor);
-            return validMoves.isEmpty();
+            HashMap<ChessPosition, ChessPiece> map = getTeamPieces(teamColor);
+            for (HashMap.Entry<ChessPosition, ChessPiece> entry : map.entrySet()) {
+                Collection<ChessMove> chessMoves = entry.getValue().pieceMoves(chessboard, entry.getKey());
+                Collection<ChessMove> checkMoves = getValidMovesCheck(chessMoves, entry.getValue());
+                if (!checkMoves.isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -216,7 +242,14 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        HashMap<ChessPosition, ChessPiece> teamPieces = getTeamPieces(teamColor);
+        for (HashMap.Entry<ChessPosition, ChessPiece> entry : teamPieces.entrySet()) {
+            Collection<ChessMove> validMoves = validMoves(entry.getKey());
+            if (!validMoves.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
