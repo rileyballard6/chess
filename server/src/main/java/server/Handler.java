@@ -8,16 +8,31 @@ import model.*;
 public class Handler {
     public static Object RegisterHandler(Request req, Response res) {
         var body = getBody(req, model.UserData.class);
+        System.out.println("Register request received");
         res.type("application/json");
         return new Gson().toJson(body);
     }
 
-    public Object LoginHandler(Request req, Response res) {
-        return null;
+    public static Object LoginHandler(Request req, Response res) {
+        var body = getBody(req, model.UserData.class);
+        System.out.println("Login request received");
+        res.type("application/json");
+        return new Gson().toJson(body);
     }
 
-    public Object GameHandler(Request req, Response res) {
-        return null;
+    public static Object GameHandler(Request req, Response res) {
+        var body = getBody(req, model.GameData.class);
+        System.out.println("GameHandler request received");
+        res.type("application/json");
+        return new Gson().toJson(body);
+    }
+
+
+    public static Object DeleteHandler(Request req, Response res) {
+        var body = getBody(req, model.UserData.class);
+        System.out.println("Delete request received");
+        res.type("application/json");
+        return new Gson().toJson(body);
     }
 
 
