@@ -18,12 +18,13 @@ public class UserService {
     //Checks if user exists, if so throws error, check if input field is null, if so throw error,
     // if not creates new User and AuthData
     public AuthData registerNewUser(UserData newInfo) throws DataAccessException {
-        if (userDAO.userExists(newInfo.username())) {
-            throw new DataAccessException("Username Already Exists");
-        }
         if (newInfo.password() == null || newInfo.email() == null || newInfo.username() == null) {
             throw new DataAccessException("Input field is null");
         }
+        if (userDAO.userExists(newInfo.username())) {
+            throw new DataAccessException("Username Already Exists");
+        }
+
 
         UserData createdUser = userDAO.createUser(newInfo);
 
@@ -52,6 +53,7 @@ public class UserService {
 
     //authDAO searches for authToken and returns either true if it was deleted, or false if it couldn't find it
     public boolean logoutUser(String authToken) throws DataAccessException {
+        System.out.println(authToken);
         if (authToken == null) {
             throw new DataAccessException("Unauthorized");
         }

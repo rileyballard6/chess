@@ -39,9 +39,10 @@ public class Handler {
         } catch (Exception e) {
             if (e.getMessage().equals("Username Already Exists")) {
                     System.out.println(e);
-                    res.status(400);
-                    return "{ \"message\": \"Error: Bad Request\" }";
+                    res.status(403);
+                    return "{ \"message\": \"Error: already taken\" }";
             } else {
+                System.out.println(e);
                 res.status(400);
                 return "{ \"message\": \"Error: Bad Request\" }";
             }
