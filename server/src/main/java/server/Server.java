@@ -22,7 +22,7 @@ public class Server {
 
         Spark.post("/user", Handler::RegisterHandler);
 
-//        //Login and Logout
+        //Login and Logout
         Spark.post("/session", Handler::LoginHandler);
         Spark.delete("/session", Handler::LoginHandler);
 
@@ -34,9 +34,6 @@ public class Server {
 
         Spark.delete("/db", Handler::DeleteHandler);
 
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
