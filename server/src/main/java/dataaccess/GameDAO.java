@@ -1,6 +1,7 @@
 package dataaccess;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 import model.*;
@@ -24,6 +25,27 @@ public class GameDAO {
         for (GameData game : gameData) {
             if (game.gameID() == gameID) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean updateGame(JoinGameData gameRequest, AuthData playerAuth) {
+        String teamColor = gameRequest.playerColor();
+        for (int i = 0; i < gameData.size(); i++) {
+            GameData game = gameData.get(i);
+            if (game.gameID() == gameRequest.gameID()) {
+                if (Objects.equals(teamColor, "WHITE") && game.whiteUsername() == null) {
+                    game = game.addPlayerWhite(playerAuth.username());
+                } else if (Objects.equals(teamColor, "BLACK") && game.blackUsername() == null) {
+                    game = game.addPlayerBlack(playerAuth.username());
+                } else {
+                    return false;
+                }
+                gameData.set(i, game);
+                System.out.println(game);
+                return true;
+
             }
         }
         return false;

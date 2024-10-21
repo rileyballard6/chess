@@ -142,9 +142,16 @@ public class Handler {
     public static Object GameHandlerPUT(Response res, String authToken, JoinGameData body ) throws DataAccessException {
         try {
             boolean gameJoined = gameService.joinGame(body, authToken);
-            res.type("application/json");
-            res.status(200);
-            return "{}";
+            if (gameJoined) {
+                res.type("application/json");
+                res.status(200);
+                return "{}";
+            } else {
+                res.type("application/json");
+                res.status(403);
+                return "{ \"message\": \"Error: Already taken\" }";
+            }
+
         } catch (Exception e) {
             res.status(401);
             return "{ \"message\": \"Error: Unauthorized\" }";

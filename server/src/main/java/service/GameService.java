@@ -66,9 +66,8 @@ public class GameService {
             throw new DataAccessException("Game doesn't exist");
         }
 
+        return gameDAO.updateGame(gameRequest, user);
 
-
-        return true;
     }
 
 
