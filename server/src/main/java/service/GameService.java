@@ -13,14 +13,12 @@ import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 public class GameService {
-    private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
-    public GameService(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
+    public GameService(AuthDAO authDAO, GameDAO gameDAO){
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
-        this.userDAO = userDAO;
     }
 
     //Check if auth token is valid, then assign game to data and send it to Data Access for storage
@@ -31,10 +29,7 @@ public class GameService {
         }
 
         GameData newGame = initialData.addGame();
-        int gameId = gameDAO.createGame(newGame);
-        System.out.println(gameId);
-
-        return gameId;
+        return gameDAO.createGame(newGame);
 
     }
 

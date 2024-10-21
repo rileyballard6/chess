@@ -20,7 +20,7 @@ public class Handler {
     private static final AuthDAO authDAO = new AuthDAO();
     private static final GameDAO gameDAO = new GameDAO();
     private static final UserService userService = new UserService(userDAO, authDAO);
-    private static final GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+    private static final GameService gameService = new GameService(authDAO, gameDAO);
     private static final ClearDataService clearService = new ClearDataService(userDAO, authDAO, gameDAO);
 
     //Service will throw an error if the user already exists or if an
@@ -41,11 +41,9 @@ public class Handler {
             }
         } catch (Exception e) {
             if (e.getMessage().equals("Username Already Exists")) {
-                    System.out.println(e);
                     res.status(403);
                     return "{ \"message\": \"Error: already taken\" }";
             } else {
-                System.out.println(e);
                 res.status(400);
                 return "{ \"message\": \"Error: Bad Request\" }";
             }
@@ -176,7 +174,7 @@ public class Handler {
         }
     }
 
-
+    //Calls Service delete, which tells all DAO to clear their data structures
     public static Object DeleteHandler(Request req, Response res) {
         try {
             if (clearService.clearAllData()) {
@@ -193,7 +191,7 @@ public class Handler {
     }
 
 
-
+    //Helper functions for getting data from body and header of request
     private static <T> T getBody(Request request, Class<T> clazz) {
         var body = new Gson().fromJson(request.body(), clazz);
         if (body == null) {

@@ -18,7 +18,6 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-        // Register your endpoints and handle exceptions here.
 
         //Register new user
         Spark.post("/user", Handler::RegisterHandler);

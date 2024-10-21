@@ -8,6 +8,7 @@ import java.util.UUID;
 public class AuthDAO {
     private final ArrayList<AuthData> authTokens = new ArrayList<>();
 
+    //Insert AuthData into array
     public AuthData createAuth(String username) {
         String newAuthToken = generateToken();
         AuthData newAuthData = new AuthData(newAuthToken, username);
@@ -15,6 +16,7 @@ public class AuthDAO {
         return newAuthData;
     }
 
+    //Loop through array and return true if auth is found
     public boolean findAuth(String authToken) {
         for (AuthData currentAuth : authTokens) {
             if (currentAuth.authToken().equals(authToken)) {
@@ -24,6 +26,7 @@ public class AuthDAO {
         return false;
     }
 
+    //Loop through array and return true when AuthData is removed
     public boolean deleteAuthData(String authToken) {
         for (int i = 0; i < authTokens.size(); i++) {
             AuthData currentAuth = authTokens.get(i);
@@ -35,6 +38,7 @@ public class AuthDAO {
         return false;
     }
 
+    //Loop through array and return the AuthData
     public AuthData getAuthData(String authToken) {
         for (AuthData currentAuth : authTokens) {
             if (currentAuth.authToken().equals(authToken)) {

@@ -17,7 +17,7 @@ public class GameServiceTest {
     private final AuthDAO testAuthDAO = new AuthDAO();
     private final GameDAO testGameDAO = new GameDAO();
     private final UserService userService = new UserService(testUserDAO, testAuthDAO);
-    private final GameService gameService = new GameService(testUserDAO, testAuthDAO, testGameDAO);
+    private final GameService gameService = new GameService(testAuthDAO, testGameDAO);
 
     public AuthData setUp() throws DataAccessException {
         UserData testData = new UserData("testLogin", "testPassword", "testEmail");

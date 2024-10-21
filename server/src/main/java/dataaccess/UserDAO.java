@@ -7,16 +7,16 @@ import java.util.Objects;
 public class UserDAO {
     private final ArrayList<UserData> users = new ArrayList<>();
 
+    //Add userData into users arraylist
     public UserData createUser(UserData userData) {
         this.users.add(userData);
-        System.out.println(users);
         return userData;
     }
 
+    //Loop through array to find user based on username, return user
     public UserData getUser(String username) {
         UserData user = null;
-        for (int i = 0; i < this.users.size(); i++) {
-            UserData currentUser = this.users.get(i);
+        for (UserData currentUser : this.users) {
             if (Objects.equals(currentUser.username(), username)) {
                 user = currentUser;
                 break;
@@ -25,9 +25,9 @@ public class UserDAO {
         return user;
     }
 
+    //Loop through array and if there is a matching username, return true
     public boolean userExists(String username) {
-        for (int i = 0; i < this.users.size(); i++) {
-            UserData currentUser = this.users.get(i);
+        for (UserData currentUser : this.users) {
             if (Objects.equals(currentUser.username(), username)) {
                 return true;
             }

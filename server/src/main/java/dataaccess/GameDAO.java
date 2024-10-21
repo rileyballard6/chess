@@ -9,6 +9,7 @@ import model.*;
 public class GameDAO {
     private final ArrayList<GameData> gameData = new ArrayList<>();
 
+    //Generate randomID, assign it to game and add it to arraylist
     public int createGame(GameData game) {
         Random rand = new Random();
         game = game.addId(rand.nextInt(1000));
@@ -17,10 +18,12 @@ public class GameDAO {
         return game.gameID();
     }
 
+    //Return array list
     public ArrayList<GameData> getGames() {
         return gameData;
     }
 
+    //Loop through array and find requested game with ID, return true if found
     public boolean gameExists(int gameID) {
         for (GameData game : gameData) {
             if (game.gameID() == gameID) {
@@ -30,6 +33,7 @@ public class GameDAO {
         return false;
     }
 
+    //Loop through array and update the GameData with username in place of team
     public boolean updateGame(JoinGameData gameRequest, AuthData playerAuth) throws DataAccessException {
         String teamColor = gameRequest.playerColor();
 

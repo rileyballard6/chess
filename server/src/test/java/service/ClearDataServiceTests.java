@@ -15,7 +15,7 @@ public class ClearDataServiceTests {
     private final AuthDAO testAuthDAO = new AuthDAO();
     private final GameDAO testGameDAO = new GameDAO();
     private final UserService userService = new UserService(testUserDAO, testAuthDAO);
-    private final GameService gameService = new GameService(testUserDAO, testAuthDAO, testGameDAO);
+    private final GameService gameService = new GameService(testAuthDAO, testGameDAO);
     private final ClearDataService clearDataService = new ClearDataService(testUserDAO, testAuthDAO, testGameDAO);
 
     //Fill up memory with some mock data
