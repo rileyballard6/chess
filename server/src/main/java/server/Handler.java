@@ -10,6 +10,8 @@ import service.UserService;
 import spark.*;
 import model.*;
 
+import java.util.ArrayList;
+
 
 public class Handler {
     private static final UserDAO userDAO = new UserDAO();
@@ -97,8 +99,14 @@ public class Handler {
     }
 
     public static Object GameHandler(Request req, Response res) throws DataAccessException {
-        var body = getBody(req, model.GameData.class);
         String authToken = getAuthToken(req);
+        if (req.requestMethod().equals("GET")) {
+            return GameHandlerGET(res, authToken);
+        }
+
+        var body = getBody(req, model.GameData.class);
+
+
 
         try {
             int newGameId = gameService.createGame(body, authToken);
@@ -110,6 +118,18 @@ public class Handler {
             return "{ \"message\": \"Error: Unauthorized\" }";
         }
 
+    }
+
+    public static Object GameHandlerGET(Response res, String authToken) throws DataAccessException {
+        try {
+            ArrayList<GameData> allGames = gameService.getAllGames(authToken);
+            res.type("application/json");
+            res.status(200);
+            return new Gson().toJson(allGames);
+        } catch (Exception e) {
+            res.status(401);
+            return "{ \"message\": \"Error: Unauthorized\" }";
+        }
     }
 
 

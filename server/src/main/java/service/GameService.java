@@ -7,6 +7,8 @@ import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import model.GameData;
 
+import java.util.ArrayList;
+
 public class GameService {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
@@ -32,6 +34,16 @@ public class GameService {
 
         return gameId;
 
+    }
+
+    public ArrayList<GameData> getAllGames(String authToken) throws DataAccessException {
+        if (!authDAO.findAuth(authToken)) {
+            throw new DataAccessException("Unauthorized");
+        }
+
+        ArrayList<GameData> allGames = gameDAO.getGames();
+        System.out.println(allGames);
+        return allGames;
     }
 
 
