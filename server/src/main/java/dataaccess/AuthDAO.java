@@ -8,10 +8,11 @@ import java.util.UUID;
 public class AuthDAO {
     private final ArrayList<AuthData> authTokens = new ArrayList<>();
 
-    public void createAuth(String username) {
+    public AuthData createAuth(String username) {
         String newAuthToken = generateToken();
-        AuthData newAuthData = new AuthData(username, newAuthToken);
+        AuthData newAuthData = new AuthData(newAuthToken, username);
         authTokens.add(newAuthData);
+        return newAuthData;
     }
 
     public AuthData getAuth(String authToken) {

@@ -35,5 +35,9 @@ public class UserDAO {
         return false;
     }
 
+    public void clearUsers() {
+        this.users.clear();
+    }
+
 
 }
