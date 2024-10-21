@@ -13,7 +13,7 @@ public class UserDAO {
         return userData;
     }
 
-    private UserData getUser(String username) {
+    public UserData getUser(String username) {
         UserData user = null;
         for (int i = 0; i < this.users.size(); i++) {
             UserData currentUser = this.users.get(i);
@@ -24,5 +24,16 @@ public class UserDAO {
         }
         return user;
     }
+
+    public boolean userExists(String username) {
+        for (int i = 0; i < this.users.size(); i++) {
+            UserData currentUser = this.users.get(i);
+            if (Objects.equals(currentUser.username(), username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

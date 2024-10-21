@@ -23,8 +23,8 @@ public class Handler {
                 return "Error: Unable to register user";
             }
         } catch (Exception e) {
-            res.status(500);
-            return "Server error: " + e.getMessage();
+            res.status(403);
+            return "{ \"message\": \"Error: already taken\" }";
         }
 
     }
