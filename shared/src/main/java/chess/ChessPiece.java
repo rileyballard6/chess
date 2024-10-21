@@ -126,21 +126,24 @@ public class ChessPiece {
             for (int capture : captures) {
                 ChessPosition capturedPiece = new ChessPosition(newRow, newCol + capture);
                 ChessPiece chesspiece = board.getPiece(capturedPiece);
-                if (chesspiece != null) {
-                    if (chesspiece.pieceColor == enemyTeam) {
-                        if (newRow == edge) {
-                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.QUEEN));
-                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.BISHOP));
-                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.ROOK));
-                            validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.KNIGHT));
-                        } else {
-                            validMoves.add(new ChessMove(myPosition, capturedPiece, null));
-                        }
-                    }
+
+                if (chesspiece == null || chesspiece.pieceColor != enemyTeam) {
+                    continue;
+                }
+
+                if (newRow == edge) {
+                    validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.QUEEN));
+                    validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.BISHOP));
+                    validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.ROOK));
+                    validMoves.add(new ChessMove(myPosition, capturedPiece, PieceType.KNIGHT));
+                } else {
+                    validMoves.add(new ChessMove(myPosition, capturedPiece, null));
                 }
             }
 
+
         }
+
     }
 
     // returns the validMoves to the main function. Gets the initial row and column of the piece to pass into the loop function.
