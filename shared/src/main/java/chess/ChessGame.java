@@ -118,7 +118,7 @@ public class ChessGame {
             }
         }
         if (isValidMove) {
-            chessboard.RemovePiece(move.getStartPosition());
+            chessboard.removePiece(move.getStartPosition());
             if (move.getPromotionPiece() != null) {
                 TeamColor color = teamTurn == TeamColor.BLACK ? TeamColor.BLACK : TeamColor.WHITE;
                 ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
@@ -143,14 +143,14 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition KingPosition = findKing(teamColor);
+        ChessPosition kingPosition = findKing(teamColor);
         HashMap<ChessPosition, ChessPiece> map = getEnemyPieces(teamColor);
 
         //Loop through the hashmap and get a collection of the moves they could use, if the king is in the endPosition, return true
         for (HashMap.Entry<ChessPosition, ChessPiece> entry : map.entrySet() ) {
             Collection<ChessMove> chessMoves = entry.getValue().pieceMoves(chessboard, entry.getKey());
             for (ChessMove iterator : chessMoves) {
-                if (iterator.getEndPosition().equals(KingPosition)) {
+                if (iterator.getEndPosition().equals(kingPosition)) {
                     return true;
                 }
             }
@@ -160,20 +160,20 @@ public class ChessGame {
 
     //Loop through the board and find the teamColor king, return his position
     private ChessPosition findKing(TeamColor teamColor) {
-        ChessPosition KingPosition = null;
+        ChessPosition kingPosition = null;
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition newPosition = new ChessPosition(i, j);
                 ChessPiece piece = chessboard.getPiece(newPosition);
                 if (piece != null) {
                     if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                        KingPosition = newPosition;
+                        kingPosition = newPosition;
                     }
                 }
 
             }
         }
-        return KingPosition;
+        return kingPosition;
     }
 
     //Loop through the board and return a map of enemy positions, and the pieces there.

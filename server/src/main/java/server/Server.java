@@ -20,19 +20,19 @@ public class Server {
         Spark.staticFiles.location("web");
 
         //Register new user
-        Spark.post("/user", Handler::RegisterHandler);
+        Spark.post("/user", Handler::registerHandler);
 
         //Login and Logout
-        Spark.post("/session", Handler::LoginHandler);
-        Spark.delete("/session", Handler::LoginHandler);
+        Spark.post("/session", Handler::loginHandler);
+        Spark.delete("/session", Handler::loginHandler);
 
         //List Games, Create game, and Join Game
-        Spark.get("/game", Handler::GameHandler);
-        Spark.post("/game", Handler::GameHandler);
-        Spark.put("/game", Handler::GameHandler);
+        Spark.get("/game", Handler::gameHandler);
+        Spark.post("/game", Handler::gameHandler);
+        Spark.put("/game", Handler::gameHandler);
 
         //Delete all data
-        Spark.delete("/db", Handler::DeleteHandler);
+        Spark.delete("/db", Handler::deleteHandler);
 
 
         Spark.awaitInitialization();

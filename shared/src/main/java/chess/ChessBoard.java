@@ -40,7 +40,7 @@ public class ChessBoard {
         return chessboard[position.getRow()][position.getColumn()];
     }
 
-    public void RemovePiece(ChessPosition position) {
+    public void removePiece(ChessPosition position) {
         chessboard[position.getRow()][position.getColumn()] = null;
     }
 
@@ -49,7 +49,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        ChessPiece.PieceType[] PieceTypeOrder = {
+        ChessPiece.PieceType[] pieceTypeOrder = {
                 ChessPiece.PieceType.ROOK,
                 ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.BISHOP,
@@ -61,9 +61,9 @@ public class ChessBoard {
         chessboard = new ChessPiece[9][9];
         for (int i = 1; i <= 8; i++) {
             chessboard[2][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            chessboard[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, PieceTypeOrder[i-1]);
+            chessboard[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, pieceTypeOrder[i-1]);
             chessboard[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            chessboard[8][i] = new ChessPiece(ChessGame.TeamColor.BLACK, PieceTypeOrder[i-1]);
+            chessboard[8][i] = new ChessPiece(ChessGame.TeamColor.BLACK, pieceTypeOrder[i-1]);
         }
 
     }
@@ -83,23 +83,23 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        String chessboard_string = "";
+        String chessboardString = "";
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (chessboard[i][j] != null) {
-                    chessboard_string += chessboard[i][j].stringLetter();
+                    chessboardString += chessboard[i][j].stringLetter();
                 } else {
-                    chessboard_string += "-";
+                    chessboardString += "-";
                 }
             }
         }
-        return chessboard_string;
+        return chessboardString;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessBoard that = (ChessBoard) o;
         return Objects.deepEquals(chessboard, that.chessboard);
     }
