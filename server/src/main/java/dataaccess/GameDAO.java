@@ -30,8 +30,11 @@ public class GameDAO {
         return false;
     }
 
-    public boolean updateGame(JoinGameData gameRequest, AuthData playerAuth) {
+    public boolean updateGame(JoinGameData gameRequest, AuthData playerAuth) throws DataAccessException {
         String teamColor = gameRequest.playerColor();
+        if (teamColor == null) {
+            throw new DataAccessException("Team color is null");
+        }
         for (int i = 0; i < gameData.size(); i++) {
             GameData game = gameData.get(i);
             if (game.gameID() == gameRequest.gameID()) {

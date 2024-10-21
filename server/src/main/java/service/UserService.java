@@ -25,7 +25,6 @@ public class UserService {
             throw new DataAccessException("Username Already Exists");
         }
 
-
         UserData createdUser = userDAO.createUser(newInfo);
 
         if (createdUser != null) {
@@ -53,14 +52,11 @@ public class UserService {
 
     //authDAO searches for authToken and returns either true if it was deleted, or false if it couldn't find it
     public boolean logoutUser(String authToken) throws DataAccessException {
-        System.out.println(authToken);
         if (authToken == null) {
             throw new DataAccessException("Unauthorized");
         }
+
         return authDAO.deleteAuthData(authToken);
     }
 
-    public void clearData() {
-        userDAO.clearUsers();
-    }
 }

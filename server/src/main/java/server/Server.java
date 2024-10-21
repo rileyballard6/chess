@@ -20,6 +20,7 @@ public class Server {
         Spark.staticFiles.location("web");
         // Register your endpoints and handle exceptions here.
 
+        //Register new user
         Spark.post("/user", Handler::RegisterHandler);
 
         //Login and Logout
@@ -31,7 +32,7 @@ public class Server {
         Spark.post("/game", Handler::GameHandler);
         Spark.put("/game", Handler::GameHandler);
 
-
+        //Delete all data
         Spark.delete("/db", Handler::DeleteHandler);
 
 

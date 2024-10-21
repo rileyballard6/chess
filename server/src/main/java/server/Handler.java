@@ -12,6 +12,7 @@ import spark.*;
 import model.*;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class Handler {
@@ -23,10 +24,11 @@ public class Handler {
     private static final ClearDataService clearService = new ClearDataService(userDAO, authDAO, gameDAO);
 
     //Register Handler
+    //Service will throw an error if the user already exists or if an
+    // input field is null, if not, returns AuthData
     public static Object RegisterHandler(Request req, Response res) {
         var body = getBody(req, model.UserData.class);
-        //Service will throw an error if the user already exists or if an
-        // input field is null, if not, returns AuthData
+
         try {
             AuthData newUserAuth = userService.registerNewUser(body);
 
@@ -58,47 +60,53 @@ public class Handler {
         String method = req.requestMethod();
 
         if (method.equals("POST")) {
-            //LOGIN
-            var body = getBody(req, model.UserData.class);
-            //Service will throw error if user doesn't exist, else it checks for the password, after which will return AuthData
-            //if correct, or 401 if wrong password
-            try {
-                AuthData authInfo = userService.loginUser(body);
-
-                if (authInfo != null) {
-                    res.type("application/json");
-                    res.status(200);
-                    return new Gson().toJson(authInfo);
-                } else {
-                    res.status(401);
-                    return "{ \"message\": \"Error: Unauthorized\" }";
-                }
-            } catch (Exception e) {
-                res.status(401);
-                return "{ \"message\": \"Error: User doesnt exist\" }";
-            }
+            return LoginHandlerPOST(req, res);
         } else if (method.equals("DELETE")) {
-            //LOGOUT
-            String authToken = getAuthToken(req);
-            //userService will return a boolean from the DataAccess layer confirming the authToken was deleted
-            try {
-                if (userService.logoutUser(authToken)) {
-                    res.type("application/json");
-                    res.status(200);
-                    return "{}";
-                } else {
-                    res.status(401);
-                    return "{ \"message\": \"Error: Auth Token not found\" }";
-                }
-            } catch (Error e) {
-                res.status(500);
-                return "{ \"message\": \"Error: Unauthorized\" }";
-            }
-
-
+            return LoginHandlerDELETE(req, res);
         }
 
         return null;
+    }
+
+    //Service will throw error if user doesn't exist, else it checks for the password, after which will return AuthData
+    //if correct, or 401 if wrong password
+    public static Object LoginHandlerPOST(Request req, Response res) throws DataAccessException {
+        var body = getBody(req, model.UserData.class);
+
+        try {
+            AuthData authInfo = userService.loginUser(body);
+
+            if (authInfo != null) {
+                res.type("application/json");
+                res.status(200);
+                return new Gson().toJson(authInfo);
+            } else {
+                res.status(401);
+                return "{ \"message\": \"Error: Unauthorized\" }";
+            }
+        } catch (Exception e) {
+            res.status(401);
+            return "{ \"message\": \"Error: User doesnt exist\" }";
+        }
+    }
+
+    //userService will return a boolean from the DataAccess layer confirming the authToken was deleted
+    public static Object LoginHandlerDELETE(Request req, Response res) throws DataAccessException {
+        String authToken = getAuthToken(req);
+
+        try {
+            if (userService.logoutUser(authToken)) {
+                res.type("application/json");
+                res.status(200);
+                return "{}";
+            } else {
+                res.status(401);
+                return "{ \"message\": \"Error: Auth Token not found\" }";
+            }
+        } catch (Error e) {
+            res.status(500);
+            return "{ \"message\": \"Error: Unauthorized\" }";
+        }
     }
 
     public static Object GameHandler(Request req, Response res) throws DataAccessException {
@@ -145,19 +153,24 @@ public class Handler {
     public static Object GameHandlerPUT(Response res, String authToken, JoinGameData body ) throws DataAccessException {
         try {
             boolean gameJoined = gameService.joinGame(body, authToken);
+            res.type("application/json");
             if (gameJoined) {
-                res.type("application/json");
                 res.status(200);
                 return "{}";
             } else {
-                res.type("application/json");
-                res.status(400);
+                res.status(403);
                 return "{ \"message\": \"Error: Already taken\" }";
             }
 
         } catch (Exception e) {
-            res.status(401);
-            return "{ \"message\": \"Error: Unauthorized\" }";
+            if (Objects.equals(e.getMessage(), "Unauthorized")) {
+                res.status(401);
+                return "{ \"message\": \"Error: Unauthorized\" }";
+            } else {
+                res.status(400);
+                return "{ \"message\": \"Error: Bad request\" }";
+            }
+
         }
     }
 

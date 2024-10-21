@@ -55,6 +55,7 @@ public class GameService {
         return filteredGames;
     }
 
+    //Checks authToken first, throws error if invalid. Gets auth data, checks if game exists, updates game
     public boolean joinGame(JoinGameData gameRequest, String authToken) throws DataAccessException {
         if (!authDAO.findAuth(authToken)) {
             throw new DataAccessException("Unauthorized");
