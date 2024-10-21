@@ -18,12 +18,8 @@ public class Handler {
     //Register Handler
     public static Object RegisterHandler(Request req, Response res) {
         var body = getBody(req, model.UserData.class);
-        //Check if any UserData is missing, if so return bad request
-        if (body.password() == null || body.email() == null || body.username() == null) {
-            res.status(400);
-            return "{ \"message\": \"Error: bad request\" }";
-        }
-        //Service will throw an error if the user already exists, if not, returns AuthData
+        //Service will throw an error if the user already exists or if an
+        // input field is null, if not, returns AuthData
         try {
             AuthData newUserAuth = userService.registerNewUser(body);
 
@@ -36,8 +32,15 @@ public class Handler {
                 return "Error: Unable to register user";
             }
         } catch (Exception e) {
-            res.status(403);
-            return "{ \"message\": \"Error: already taken\" }";
+            if (e.getMessage().equals("Username Already Exists")) {
+                    System.out.println(e);
+                    res.status(403);
+                    return "{ \"message\": \"Error: Username already taken\" }";
+            } else {
+                res.status(403);
+                return "{ \"message\": \"Error: Input field is null\" }";
+            }
+
         }
 
     }

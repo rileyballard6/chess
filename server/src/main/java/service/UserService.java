@@ -4,6 +4,8 @@ import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import model.*;
 
+import javax.xml.crypto.Data;
+
 public class UserService {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
@@ -13,11 +15,16 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    //Checks if user exists, if so throws error, if not creates new User and AuthData
+    //Checks if user exists, if so throws error, check if input field is null, if so throw error,
+    // if not creates new User and AuthData
     public AuthData registerNewUser(UserData newInfo) throws DataAccessException {
         if (userDAO.userExists(newInfo.username())) {
             throw new DataAccessException("Username Already Exists");
         }
+        if (newInfo.password() == null || newInfo.email() == null || newInfo.username() == null) {
+            throw new DataAccessException("Input field is null");
+        }
+
         UserData createdUser = userDAO.createUser(newInfo);
 
         if (createdUser != null) {
