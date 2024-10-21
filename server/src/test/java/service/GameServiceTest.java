@@ -45,21 +45,75 @@ public class GameServiceTest {
     @DisplayName("Create Game fail")
 
     public void createGameFail() throws DataAccessException {
+        AuthData authData = setUp();
+        GameData newGame = new GameData(0, null, null, "gameName", null);
+
+        assertThrows(DataAccessException.class, () -> gameService.createGame(newGame, null));
 
     }
 
     @Test
     @DisplayName("List Games Success")
-
+    //Adds two games, then calls the getAllGames to ensure the data structure recieved is correct length
     public void listGamesSuccess() throws DataAccessException {
+        AuthData authData = setUp();
+        GameData newGame = new GameData(0, null, null, "gameName", null);
+        GameData newGame2 = new GameData(0, null, null, "gameName2", null);
 
+
+        int gameId = gameService.createGame(newGame, authData.authToken());
+        int gameId2 = gameService.createGame(newGame2, authData.authToken());
+        ArrayList<GameData> games = gameService.getAllGames(authData.authToken());
+
+        assertFalse(games.isEmpty());
+        assertEquals(2, games.size());
     }
 
     @Test
     @DisplayName("List Games fail")
-
+    //Adds two games, then tries to retrieve them without a valid auth token twice
     public void listGameFail() throws DataAccessException {
+        AuthData authData = setUp();
+        GameData newGame = new GameData(0, null, null, "gameName", null);
+        GameData newGame2 = new GameData(0, null, null, "gameName2", null);
 
+        int gameId = gameService.createGame(newGame, authData.authToken());
+        int gameId2 = gameService.createGame(newGame2, authData.authToken());
+        assertThrows(DataAccessException.class, () -> gameService.getAllGames(null));
+        assertThrows(DataAccessException.class, () -> gameService.getAllGames("abcsdjhasidh"));
+    }
+
+    @Test
+    @DisplayName("Join Games Success")
+    //Creates new game, then requests to join that game based on the provided gameID
+    public void joinGameSuccess() throws DataAccessException {
+        AuthData authData = setUp();
+        GameData newGame = new GameData(0, null, null, "gameName", null);
+
+        int gameId = gameService.createGame(newGame, authData.authToken());
+        JoinGameData joinGameRequest = new JoinGameData("BLACK", gameId);
+        boolean status = gameService.joinGame(joinGameRequest, authData.authToken());
+
+        assertTrue(status);
+    }
+
+    @Test
+    @DisplayName("Join Games fail")
+    //Creates game and joins. Assert an exception is thrown when joining with no authToken, assert false
+    //When game is tried to join when team is already occupied
+    public void joinGameFail() throws DataAccessException {
+        AuthData authData = setUp();
+        GameData newGame = new GameData(0, null, null, "gameName", null);
+
+        int gameId = gameService.createGame(newGame, authData.authToken());
+        JoinGameData joinGameRequest = new JoinGameData("BLACK", gameId);
+        boolean status = gameService.joinGame(joinGameRequest, authData.authToken());
+
+        assertThrows(DataAccessException.class, () -> gameService.joinGame(joinGameRequest, null));
+
+        boolean statusRejoin = gameService.joinGame(joinGameRequest, authData.authToken());
+
+        assertFalse(statusRejoin);
     }
 
 
