@@ -19,16 +19,18 @@ public class GameService {
     }
 
     //Check if auth token is valid, then assign game to data and send it to Data Access for storage
+    //Data access will send back the gameID generated
     public int createGame(GameData initialData, String authToken) throws DataAccessException {
         if (!authDAO.findAuth(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
 
-        GameData newGame = new GameData(0, null, null, initialData.gameName(), new ChessGame());
+        GameData newGame = initialData.addGame();
+        int gameId = gameDAO.createGame(newGame);
+        System.out.println(gameId);
 
-        System.out.println(newGame);
 
-        return newGame.gameId();
+        return gameId;
 
     }
 

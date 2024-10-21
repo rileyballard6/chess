@@ -101,14 +101,15 @@ public class Handler {
         String authToken = getAuthToken(req);
 
         try {
-            gameService.createGame(body, authToken);
-
+            int newGameId = gameService.createGame(body, authToken);
+            res.type("application/json");
+            res.status(200);
+            return "{ \"gameID\": \"" + newGameId + "\" }";
         } catch (Exception e) {
             res.status(401);
             return "{ \"message\": \"Error: Unauthorized\" }";
         }
-        res.type("application/json");
-        return new Gson().toJson(body);
+
     }
 
 

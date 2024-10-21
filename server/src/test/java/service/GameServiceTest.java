@@ -6,6 +6,10 @@ import dataaccess.*;
 import org.junit.jupiter.api.*;
 import model.*;
 
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class GameServiceTest {
 
@@ -24,12 +28,23 @@ public class GameServiceTest {
 
     @Test
     @DisplayName("Create Game Success")
-
+    //Asserts that an Int is returned as the gameID and that the games
+    //Array list in the database is not empty
     public void createGameSuccess() throws DataAccessException {
         AuthData authData = setUp();
         GameData newGame = new GameData(0, null, null, "gameName", null);
 
         int gameId = gameService.createGame(newGame, authData.authToken());
-        System.out.println(gameId);
+        ArrayList<GameData> games = testGameDAO.getGames();
+
+        assertInstanceOf(Integer.class, gameId, "value not an int");
+        assertFalse(games.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Create Game fail")
+
+    public void createGameFail() throws DataAccessException {
+
     }
 }
