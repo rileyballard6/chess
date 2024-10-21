@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
@@ -17,11 +18,18 @@ public class GameService {
         this.userDAO = userDAO;
     }
 
-    public void createGame(GameData initialData, String authToken) throws DataAccessException {
+    //Check if auth token is valid, then assign game to data and send it to Data Access for storage
+    public int createGame(GameData initialData, String authToken) throws DataAccessException {
         if (!authDAO.findAuth(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
-        System.out.println(initialData);
+
+        GameData newGame = new GameData(0, null, null, initialData.gameName(), new ChessGame());
+
+        System.out.println(newGame);
+
+        return newGame.gameId();
+
     }
 
 

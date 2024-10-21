@@ -6,7 +6,6 @@ import dataaccess.UserDAO;
 import org.junit.jupiter.api.*;
 import model.*;
 
-import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
