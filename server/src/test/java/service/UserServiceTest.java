@@ -41,6 +41,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Login User success")
+    //Registers a new user, then ensures that logging in will return correct authData
     public void loginTestSuccess() throws DataAccessException {
         UserData testData = new UserData("testLogin", "testPassword", "testEmail");
         userService.registerNewUser(testData);
@@ -52,5 +53,31 @@ public class UserServiceTest {
         assertNotNull(loginSuccess.authToken());
         assertFalse(loginSuccess.authToken().isEmpty());
 
+    }
+
+    @Test
+    @DisplayName("Login User Fail")
+    //Ensure error is thrown if user doesn't exist, returns null if the wrong password is entered
+    public void loginTestFail() throws DataAccessException {
+        UserData testData = new UserData("testLogin", "testPassword", "testEmail");
+        userService.registerNewUser(testData);
+        UserData loginTest = new UserData("testUser", "testPassword", null);
+        UserData loginTestWrongPassword = new UserData("testLogin", "asdjoijw", null);
+
+        assertThrows(DataAccessException.class, () -> userService.loginUser(loginTest));
+        assertNull(userService.loginUser(loginTestWrongPassword));
+    }
+
+    @Test
+    @DisplayName("Logout Test Success")
+    // Checks that logging out is returning true if successful logout, and false if auth token not found
+    public void logoutTestSuccess() throws DataAccessException {
+        UserData testData = new UserData("testLogin", "testPassword", "testEmail");
+        userService.registerNewUser(testData);
+        UserData loginTest = new UserData("testLogin", "testPassword", null);
+        AuthData loginSuccess = userService.loginUser(loginTest);
+
+        assertTrue(userService.logoutUser(loginSuccess.authToken()));
+        assertFalse(userService.logoutUser("asoidjaoijdw"));
     }
 }

@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import service.UserService;
@@ -46,7 +47,7 @@ public class Handler {
     }
 
     //Login handler for logging in and logging out
-    public static Object LoginHandler(Request req, Response res) {
+    public static Object LoginHandler(Request req, Response res) throws DataAccessException {
         String method = req.requestMethod();
 
         if (method.equals("POST")) {
@@ -72,19 +73,21 @@ public class Handler {
         } else if (method.equals("DELETE")) {
             //LOGOUT
             String authToken = getAuthToken(req);
-            if (authToken == null) {
+            //userService will return a boolean from the DataAccess layer confirming the authToken was deleted
+            try {
+                if (userService.logoutUser(authToken)) {
+                    res.type("application/json");
+                    res.status(200);
+                    return "{}";
+                } else {
+                    res.status(500);
+                    return "{ \"message\": \"Error: Auth Token not found\" }";
+                }
+            } catch (Error e) {
                 res.status(401);
                 return "{ \"message\": \"Error: Unauthorized\" }";
             }
-            //userService will return a boolean from the DataAccess layer confirming the authToken was deleted
-            if (userService.logoutUser(authToken)) {
-                res.type("application/json");
-                res.status(200);
-                return "{}";
-            } else {
-                res.status(500);
-                return "{ \"message\": \"Error: Auth Token not found\" }";
-            }
+
 
         }
 

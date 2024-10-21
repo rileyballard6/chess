@@ -51,7 +51,10 @@ public class UserService {
     }
 
     //authDAO searches for authToken and returns either true if it was deleted, or false if it couldn't find it
-    public boolean logoutUser(String authToken) {
+    public boolean logoutUser(String authToken) throws DataAccessException {
+        if (authToken == null) {
+            throw new DataAccessException("Unauthorized");
+        }
         return authDAO.deleteAuthData(authToken);
     }
 
