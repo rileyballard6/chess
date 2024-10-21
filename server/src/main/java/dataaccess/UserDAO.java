@@ -7,9 +7,10 @@ import java.util.Objects;
 public class UserDAO {
     private final ArrayList<UserData> users = new ArrayList<>();
 
-    private void createUser(UserData userData) {
+    public UserData createUser(UserData userData) {
         this.users.add(userData);
-        System.out.println(userData.username());
+        System.out.println(users);
+        return userData;
     }
 
     private UserData getUser(String username) {
