@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import service.UserService;
 import spark.*;
@@ -11,8 +12,10 @@ import model.*;
 public class Handler {
     private static final UserDAO userDAO = new UserDAO();
     private static final AuthDAO authDAO = new AuthDAO();
+    private static final GameDAO gameDAO = new GameDAO();
     private static final UserService userService = new UserService(userDAO, authDAO);
 
+    //Register Handler
     public static Object RegisterHandler(Request req, Response res) {
         var body = getBody(req, model.UserData.class);
         //Check if any UserData is missing, if so return bad request
@@ -39,6 +42,7 @@ public class Handler {
 
     }
 
+    //Login handler for logging in and logging out
     public static Object LoginHandler(Request req, Response res) {
         String method = req.requestMethod();
 
@@ -64,10 +68,21 @@ public class Handler {
             }
         } else if (method.equals("DELETE")) {
             //LOGOUT
-            var body = getBody(req, model.UserData.class);
-            System.out.println("Login request received");
-            res.type("application/json");
-            return new Gson().toJson(body);
+            String authToken = getAuthToken(req);
+            if (authToken == null) {
+                res.status(401);
+                return "{ \"message\": \"Error: Unauthorized\" }";
+            }
+            //userService will return a boolean from the DataAccess layer confirming the authToken was deleted
+            if (userService.logoutUser(authToken)) {
+                res.type("application/json");
+                res.status(200);
+                return "{}";
+            } else {
+                res.status(500);
+                return "{ \"message\": \"Error: Auth Token not found\" }";
+            }
+
         }
 
         return null;
@@ -94,5 +109,9 @@ public class Handler {
             throw new RuntimeException("missing required body");
         }
         return body;
+    }
+
+    private static String getAuthToken(Request request) {
+        return request.headers("authorization");
     }
 }

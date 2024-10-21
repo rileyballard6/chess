@@ -15,8 +15,16 @@ public class AuthDAO {
         return newAuthData;
     }
 
-    public AuthData getAuth(String authToken) {
-        return null;
+    public boolean deleteAuthData(String authToken) {
+        for (int i = 0; i < authTokens.size(); i++) {
+            AuthData currentAuth = authTokens.get(i);
+            if (currentAuth.authToken().equals(authToken)) {
+                authTokens.remove(i);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
