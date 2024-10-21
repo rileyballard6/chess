@@ -44,6 +44,11 @@ public class AuthDAO {
         return null;
     }
 
+    public boolean clearAuth() {
+        this.authTokens.clear();
+        return true;
+    }
+
 
     public static String generateToken() {
         return UUID.randomUUID().toString();

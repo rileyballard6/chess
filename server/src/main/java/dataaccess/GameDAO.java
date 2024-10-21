@@ -50,4 +50,9 @@ public class GameDAO {
         }
         return false;
     }
+
+    public boolean clearGames() {
+        this.gameData.clear();
+        return true;
+    }
 }

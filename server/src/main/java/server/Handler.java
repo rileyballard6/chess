@@ -5,6 +5,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import service.ClearDataService;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -19,6 +20,7 @@ public class Handler {
     private static final GameDAO gameDAO = new GameDAO();
     private static final UserService userService = new UserService(userDAO, authDAO);
     private static final GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+    private static final ClearDataService clearService = new ClearDataService(userDAO, authDAO, gameDAO);
 
     //Register Handler
     public static Object RegisterHandler(Request req, Response res) {
@@ -34,7 +36,7 @@ public class Handler {
                 return new Gson().toJson(newUserAuth);
             } else {
                 res.status(500);
-                return "Error: Unable to register user";
+                return "{ \"message\": \"Error: Unable to register\" }";
             }
         } catch (Exception e) {
             if (e.getMessage().equals("Username Already Exists")) {
@@ -149,7 +151,7 @@ public class Handler {
                 return "{}";
             } else {
                 res.type("application/json");
-                res.status(403);
+                res.status(400);
                 return "{ \"message\": \"Error: Already taken\" }";
             }
 
@@ -161,8 +163,18 @@ public class Handler {
 
 
     public static Object DeleteHandler(Request req, Response res) {
-        System.out.println("Delete request received");
-        return "{}";
+        try {
+            if (clearService.clearAllData()) {
+                return "{}";
+            } else {
+                res.status(500);
+                return "{ \"message\": \"Error: Database error\" }";
+            }
+        } catch (Error e) {
+            res.status(500);
+            return "{ \"message\": \"Error: Database error\" }";
+        }
+
     }
 
 
