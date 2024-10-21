@@ -3,8 +3,12 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearDataServiceTests {
     private final UserDAO testUserDAO = new UserDAO();
@@ -14,9 +18,31 @@ public class ClearDataServiceTests {
     private final GameService gameService = new GameService(testUserDAO, testAuthDAO, testGameDAO);
     private final ClearDataService clearDataService = new ClearDataService(testUserDAO, testAuthDAO, testGameDAO);
 
+    //Fill up memory with some mock data
+    public void setUp() throws Exception {
+        UserData testData = new UserData("testLogin", "testPassword", "testEmail");
+        UserData testData2 = new UserData("testLogin2", "testPassword2", "testEmail2");
+        userService.registerNewUser(testData);
+        AuthData authData = userService.registerNewUser(testData2);
+
+        GameData newGame = new GameData(0, null, null, "gameName", null);
+        GameData newGame2 = new GameData(0, null, null, "gameName", null);
+
+        gameService.createGame(newGame, authData.authToken());
+        gameService.createGame(newGame2, authData.authToken());
+    }
+
     @Test
     @DisplayName("Delete Data Test")
-    public void testDeleteData() {
-        
+    public void testDeleteData() throws Exception {
+        setUp();
+
+        clearDataService.clearAllData();
+
+        assertTrue(testGameDAO.isEmpty());
+        assertTrue(testUserDAO.isEmpty());
+        assertTrue(testAuthDAO.isEmpty());
+
+
     }
 }

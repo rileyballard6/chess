@@ -43,9 +43,8 @@ public class GameServiceTest {
 
     @Test
     @DisplayName("Create Game fail")
-
+    //Creates a new game and asserts that an exception is thrown when trying to add with no auth.
     public void createGameFail() throws DataAccessException {
-        AuthData authData = setUp();
         GameData newGame = new GameData(0, null, null, "gameName", null);
 
         assertThrows(DataAccessException.class, () -> gameService.createGame(newGame, null));
@@ -77,8 +76,8 @@ public class GameServiceTest {
         GameData newGame = new GameData(0, null, null, "gameName", null);
         GameData newGame2 = new GameData(0, null, null, "gameName2", null);
 
-        int gameId = gameService.createGame(newGame, authData.authToken());
-        int gameId2 = gameService.createGame(newGame2, authData.authToken());
+        gameService.createGame(newGame, authData.authToken());
+        gameService.createGame(newGame2, authData.authToken());
         assertThrows(DataAccessException.class, () -> gameService.getAllGames(null));
         assertThrows(DataAccessException.class, () -> gameService.getAllGames("abcsdjhasidh"));
     }

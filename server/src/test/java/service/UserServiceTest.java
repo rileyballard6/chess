@@ -32,9 +32,13 @@ public class UserServiceTest {
     @DisplayName("Register User fail")
     //Checks that the Service is ensuring all fields are there
     public void registerTestFail() throws DataAccessException {
-        UserData testData = new UserData("testUsername", null, "testEmail");
+        UserData testNoPassword = new UserData("testUsername", null, "testEmail");
+        UserData testNoUsername = new UserData(null, "asd", "testEmail");
+        UserData testNoEmail = new UserData("testUsername", "asd", null);
 
-        assertThrows(DataAccessException.class, () -> userService.registerNewUser(testData));
+        assertThrows(DataAccessException.class, () -> userService.registerNewUser(testNoPassword));
+        assertThrows(DataAccessException.class, () -> userService.registerNewUser(testNoUsername));
+        assertThrows(DataAccessException.class, () -> userService.registerNewUser(testNoEmail));
 
     }
 
@@ -48,7 +52,6 @@ public class UserServiceTest {
         AuthData loginSuccess = userService.loginUser(loginTest);
 
         assertEquals("testLogin", loginSuccess.username());
-
         assertNotNull(loginSuccess.authToken());
         assertFalse(loginSuccess.authToken().isEmpty());
 
@@ -87,7 +90,7 @@ public class UserServiceTest {
         UserData testData = new UserData("testLogin", "testPassword", "testEmail");
         userService.registerNewUser(testData);
         UserData loginTest = new UserData("testLogin", "testPassword", null);
-        AuthData loginSuccess = userService.loginUser(loginTest);
+        userService.loginUser(loginTest);
 
         assertThrows(DataAccessException.class, () -> userService.logoutUser(null));
         assertFalse(userService.logoutUser("asidjow"));

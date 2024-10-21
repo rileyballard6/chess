@@ -67,6 +67,10 @@ public class GameService {
             throw new DataAccessException("Game doesn't exist");
         }
 
+        if (gameRequest.playerColor() == null) {
+            throw new DataAccessException("Team color is null");
+        }
+
         return gameDAO.updateGame(gameRequest, user);
 
     }

@@ -23,7 +23,6 @@ public class Handler {
     private static final GameService gameService = new GameService(userDAO, authDAO, gameDAO);
     private static final ClearDataService clearService = new ClearDataService(userDAO, authDAO, gameDAO);
 
-    //Register Handler
     //Service will throw an error if the user already exists or if an
     // input field is null, if not, returns AuthData
     public static Object RegisterHandler(Request req, Response res) {
@@ -126,6 +125,7 @@ public class Handler {
         return null;
     }
 
+    //Service checks authToken and retrieves the list of games, or throws an error if unauthorized
     public static Object GameHandlerGET(Response res, String authToken) throws DataAccessException {
         try {
             ArrayList<GameData> allGames = gameService.getAllGames(authToken);
@@ -138,6 +138,7 @@ public class Handler {
         }
     }
 
+    //Service checks authToken and creates a new game, or throws an error if unauthorized
     public static Object GameHandlerPOST(Response res, String authToken, GameData body) throws DataAccessException {
         try {
             int newGameId = gameService.createGame(body, authToken);
@@ -150,6 +151,7 @@ public class Handler {
         }
     }
 
+    //Service checks authToken and joins a game, or throws an error if unauthorized
     public static Object GameHandlerPUT(Response res, String authToken, JoinGameData body ) throws DataAccessException {
         try {
             boolean gameJoined = gameService.joinGame(body, authToken);

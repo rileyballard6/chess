@@ -49,6 +49,10 @@ public class AuthDAO {
         return true;
     }
 
+    public boolean isEmpty() {
+        return authTokens.isEmpty();
+    }
+
 
     public static String generateToken() {
         return UUID.randomUUID().toString();

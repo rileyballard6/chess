@@ -40,5 +40,9 @@ public class UserDAO {
         return true;
     }
 
+    public boolean isEmpty() {
+        return this.users.isEmpty();
+    }
+
 
 }
