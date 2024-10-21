@@ -80,4 +80,17 @@ public class UserServiceTest {
         assertTrue(userService.logoutUser(loginSuccess.authToken()));
         assertFalse(userService.logoutUser("asoidjaoijdw"));
     }
+
+    @Test
+    @DisplayName("Logout Test Fail")
+
+    public void logoutTestFail() throws DataAccessException {
+        UserData testData = new UserData("testLogin", "testPassword", "testEmail");
+        userService.registerNewUser(testData);
+        UserData loginTest = new UserData("testLogin", "testPassword", null);
+        AuthData loginSuccess = userService.loginUser(loginTest);
+
+        assertThrows(DataAccessException.class, () -> userService.logoutUser(null));
+        assertFalse(userService.logoutUser("asidjow"));
+    }
 }

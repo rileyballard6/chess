@@ -5,6 +5,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import service.GameService;
 import service.UserService;
 import spark.*;
 import model.*;
@@ -15,6 +16,7 @@ public class Handler {
     private static final AuthDAO authDAO = new AuthDAO();
     private static final GameDAO gameDAO = new GameDAO();
     private static final UserService userService = new UserService(userDAO, authDAO);
+    private static final GameService gameService = new GameService(userDAO, authDAO, gameDAO);
 
     //Register Handler
     public static Object RegisterHandler(Request req, Response res) {
@@ -35,11 +37,11 @@ public class Handler {
         } catch (Exception e) {
             if (e.getMessage().equals("Username Already Exists")) {
                     System.out.println(e);
-                    res.status(403);
-                    return "{ \"message\": \"Error: Username already taken\" }";
+                    res.status(400);
+                    return "{ \"message\": \"Error: Bad Request\" }";
             } else {
-                res.status(403);
-                return "{ \"message\": \"Error: Input field is null\" }";
+                res.status(400);
+                return "{ \"message\": \"Error: Bad Request\" }";
             }
 
         }
@@ -80,11 +82,11 @@ public class Handler {
                     res.status(200);
                     return "{}";
                 } else {
-                    res.status(500);
+                    res.status(401);
                     return "{ \"message\": \"Error: Auth Token not found\" }";
                 }
             } catch (Error e) {
-                res.status(401);
+                res.status(500);
                 return "{ \"message\": \"Error: Unauthorized\" }";
             }
 
@@ -94,9 +96,17 @@ public class Handler {
         return null;
     }
 
-    public static Object GameHandler(Request req, Response res) {
+    public static Object GameHandler(Request req, Response res) throws DataAccessException {
         var body = getBody(req, model.GameData.class);
-        System.out.println("GameHandler request received");
+        String authToken = getAuthToken(req);
+
+        try {
+            gameService.createGame(body, authToken);
+
+        } catch (Exception e) {
+            res.status(401);
+            return "{ \"message\": \"Error: Unauthorized\" }";
+        }
         res.type("application/json");
         return new Gson().toJson(body);
     }

@@ -1,8 +1,10 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import model.GameData;
 
 public class GameService {
     private final UserDAO userDAO;
@@ -14,4 +16,13 @@ public class GameService {
         this.gameDAO = gameDAO;
         this.userDAO = userDAO;
     }
+
+    public void createGame(GameData initialData, String authToken) throws DataAccessException {
+        if (!authDAO.findAuth(authToken)) {
+            throw new DataAccessException("Unauthorized");
+        }
+        System.out.println(initialData);
+    }
+
+
 }
