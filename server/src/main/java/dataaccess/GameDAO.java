@@ -13,10 +13,19 @@ public class GameDAO {
         game = game.addId(rand.nextInt(1000));
         gameData.add(game);
 
-        return game.gameId();
+        return game.gameID();
     }
 
     public ArrayList<GameData> getGames() {
         return gameData;
+    }
+
+    public boolean gameExists(int gameID) {
+        for (GameData game : gameData) {
+            if (game.gameID() == gameID) {
+                return true;
+            }
+        }
+        return false;
     }
 }

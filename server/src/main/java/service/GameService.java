@@ -5,8 +5,11 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import model.AuthData;
 import model.GameData;
+import model.JoinGameData;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 public class GameService {
@@ -31,19 +34,41 @@ public class GameService {
         int gameId = gameDAO.createGame(newGame);
         System.out.println(gameId);
 
-
         return gameId;
 
     }
 
+    //Checks Auth Token, then Retrieves a list of all the games from DataAccess,
+    // then filters out the actual ChessGame Object
     public ArrayList<GameData> getAllGames(String authToken) throws DataAccessException {
         if (!authDAO.findAuth(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
 
         ArrayList<GameData> allGames = gameDAO.getGames();
-        System.out.println(allGames);
-        return allGames;
+        ArrayList<GameData> filteredGames = new ArrayList<>();
+
+        for (GameData game : allGames) {
+            filteredGames.add(game.removeGame());
+        }
+
+        return filteredGames;
+    }
+
+    public boolean joinGame(JoinGameData gameRequest, String authToken) throws DataAccessException {
+        if (!authDAO.findAuth(authToken)) {
+            throw new DataAccessException("Unauthorized");
+        }
+
+        AuthData user = authDAO.getAuthData(authToken);
+
+        if (!gameDAO.gameExists(gameRequest.gameID())) {
+            throw new DataAccessException("Game doesn't exist");
+        }
+
+
+
+        return true;
     }
 
 

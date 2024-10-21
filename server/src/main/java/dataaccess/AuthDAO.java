@@ -32,8 +32,16 @@ public class AuthDAO {
                 return true;
             }
         }
-
         return false;
+    }
+
+    public AuthData getAuthData(String authToken) {
+        for (AuthData currentAuth : authTokens) {
+            if (currentAuth.authToken().equals(authToken)) {
+                return currentAuth;
+            }
+        }
+        return null;
     }
 
 

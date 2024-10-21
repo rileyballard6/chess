@@ -47,4 +47,20 @@ public class GameServiceTest {
     public void createGameFail() throws DataAccessException {
 
     }
+
+    @Test
+    @DisplayName("List Games Success")
+
+    public void listGamesSuccess() throws DataAccessException {
+
+    }
+
+    @Test
+    @DisplayName("List Games fail")
+
+    public void listGameFail() throws DataAccessException {
+
+    }
+
+
 }

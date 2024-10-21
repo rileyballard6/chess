@@ -104,10 +104,30 @@ public class Handler {
             return GameHandlerGET(res, authToken);
         }
 
-        var body = getBody(req, model.GameData.class);
+        if (req.requestMethod().equals("POST")) {
+            var body = getBody(req, model.GameData.class);
+            return GameHandlerPOST(res, authToken, body);
+        } else if (req.requestMethod().equals("PUT")) {
+            var body = getBody(req, model.JoinGameData.class);
+            return GameHandlerPUT(res, authToken, body);
+        }
 
+        return null;
+    }
 
+    public static Object GameHandlerGET(Response res, String authToken) throws DataAccessException {
+        try {
+            ArrayList<GameData> allGames = gameService.getAllGames(authToken);
+            res.type("application/json");
+            res.status(200);
+            return "{ \"games\":" + new Gson().toJson(allGames) + "}";
+        } catch (Exception e) {
+            res.status(401);
+            return "{ \"message\": \"Error: Unauthorized\" }";
+        }
+    }
 
+    public static Object GameHandlerPOST(Response res, String authToken, GameData body) throws DataAccessException {
         try {
             int newGameId = gameService.createGame(body, authToken);
             res.type("application/json");
@@ -117,15 +137,14 @@ public class Handler {
             res.status(401);
             return "{ \"message\": \"Error: Unauthorized\" }";
         }
-
     }
 
-    public static Object GameHandlerGET(Response res, String authToken) throws DataAccessException {
+    public static Object GameHandlerPUT(Response res, String authToken, JoinGameData body ) throws DataAccessException {
         try {
-            ArrayList<GameData> allGames = gameService.getAllGames(authToken);
+            boolean gameJoined = gameService.joinGame(body, authToken);
             res.type("application/json");
             res.status(200);
-            return new Gson().toJson(allGames);
+            return "{}";
         } catch (Exception e) {
             res.status(401);
             return "{ \"message\": \"Error: Unauthorized\" }";
