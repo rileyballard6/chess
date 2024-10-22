@@ -108,6 +108,7 @@ public class Handler {
 
     public static Object gameHandler(Request req, Response res) throws DataAccessException {
         String authToken = getAuthToken(req);
+
         if (req.requestMethod().equals("GET")) {
             return gameHandlerGET(res, authToken);
         }

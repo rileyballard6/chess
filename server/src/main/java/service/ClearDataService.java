@@ -15,6 +15,7 @@ public class ClearDataService {
         this.userDAO = userDAO;
     }
 
+    //Accesses the clear method on each data access object. Removes all elements from data structure
     public boolean clearAllData() {
         boolean authStatus = authDAO.clearAuth();
         boolean userStatus = userDAO.clearUsers();

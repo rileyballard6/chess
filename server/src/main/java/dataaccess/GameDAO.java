@@ -34,7 +34,7 @@ public class GameDAO {
     }
 
     //Loop through array and update the GameData with username in place of team
-    public boolean updateGame(JoinGameData gameRequest, AuthData playerAuth) throws DataAccessException {
+    public boolean updateGame(JoinGameData gameRequest, AuthData playerAuth) {
         String teamColor = gameRequest.playerColor();
 
         for (int i = 0; i < gameData.size(); i++) {

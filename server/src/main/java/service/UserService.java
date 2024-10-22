@@ -35,6 +35,7 @@ public class UserService {
     }
 
     //Checks if user exists, if so checks password and returns authData
+    //If user is found, create authData and return it to handler
     public AuthData loginUser(UserData userInfo) throws DataAccessException {
         if (!userDAO.userExists(userInfo.username())) {
             throw new DataAccessException("User doesnt exist");
@@ -42,7 +43,6 @@ public class UserService {
 
         UserData user = userDAO.getUser(userInfo.username());
 
-        //If user is found, create authData and return it to handler
         if (user.password().equals(userInfo.password())) {
             return authDAO.createAuth(user.username());
         } else {
