@@ -21,7 +21,8 @@ public class UserService {
         if (newInfo.password() == null || newInfo.email() == null || newInfo.username() == null) {
             throw new DataAccessException("Input field is null");
         }
-        if (userDAO.userExists(newInfo.username())) {
+
+        if (userDAO.userExistsSQL(newInfo.username())) {
             throw new DataAccessException("Username Already Exists");
         }
 
@@ -37,11 +38,11 @@ public class UserService {
     //Checks if user exists, if so checks password and returns authData
     //If user is found, create authData and return it to handler
     public AuthData loginUser(UserData userInfo) throws DataAccessException {
-        if (!userDAO.userExists(userInfo.username())) {
+        if (!userDAO.userExistsSQL(userInfo.username())) {
             throw new DataAccessException("User doesnt exist");
         }
 
-        UserData user = userDAO.getUser(userInfo.username());
+        UserData user = userDAO.getUserSQL(userInfo.username());
 
         if (user.password().equals(userInfo.password())) {
             return authDAO.createAuth(user.username());

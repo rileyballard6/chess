@@ -44,6 +44,7 @@ public class Handler {
                     res.status(403);
                     return "{ \"message\": \"Error: already taken\" }";
             } else {
+                System.out.println(e);
                 res.status(400);
                 return "{ \"message\": \"Error: Bad Request\" }";
             }

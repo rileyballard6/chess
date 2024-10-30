@@ -15,14 +15,15 @@ public class UserDAO {
     private final ArrayList<UserData> users = new ArrayList<>();
 
     //Add userData into users arraylist
-    public UserData createUser(UserData userData) {
-        this.users.add(userData);
-        return userData;
-    }
+//    public UserData createUser(UserData userData) {
+//        this.users.add(userData);
+//        return userData;
+//    }
 
+    //Add userData into sql server UserData table (first hash the password)
     public UserData createUserSQL(UserData userData) throws DataAccessException {
+        System.out.println("uhh");
         String hashedPassword = hashPassword(userData.password());
-        System.out.println("request recieved");
 
         String sqlQuery = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
 
@@ -32,14 +33,12 @@ public class UserDAO {
                 preparedStatement.setString(2, hashedPassword);
                 preparedStatement.setString(3, userData.email());
                 preparedStatement.executeUpdate();
+                return userData;
             }
         } catch (SQLException e) {
-            System.out.println("error");
-            System.out.println(e);
             throw new RuntimeException(e);
         }
 
-        return userData;
     }
 
     //Loop through array to find user based on username, return user
@@ -54,6 +53,30 @@ public class UserDAO {
         return user;
     }
 
+    public UserData getUserSQL(String givenUsername) throws DataAccessException {
+        String sqlQuery = "SELECT username, password, email FROM UserData WHERE username = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setString(1, givenUsername);
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    UserData newData = new UserData(rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("email"));
+                    System.out.println(newData);
+                    return newData;
+                } else {
+                    return null;
+                }
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     //Loop through array and if there is a matching username, return true
     public boolean userExists(String username) {
         for (UserData currentUser : this.users) {
@@ -63,6 +86,26 @@ public class UserDAO {
         }
         return false;
     }
+
+    public boolean userExistsSQL(String givenUsername) throws DataAccessException {
+        String sqlQuery = "SELECT username FROM UserData WHERE username = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setString(1, givenUsername);
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    UserData newData = new UserData(rs.getString("username"), null, null);
+                    return Objects.equals(newData.username(), givenUsername);
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public boolean clearUsers() {
         this.users.clear();
