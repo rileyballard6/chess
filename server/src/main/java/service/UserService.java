@@ -25,7 +25,7 @@ public class UserService {
             throw new DataAccessException("Username Already Exists");
         }
 
-        UserData createdUser = userDAO.createUser(newInfo);
+        UserData createdUser = userDAO.createUserSQL(newInfo);
 
         if (createdUser != null) {
             return authDAO.createAuth(createdUser.username());

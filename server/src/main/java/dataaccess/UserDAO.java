@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 
 public class UserDAO {
     private final ArrayList<UserData> users = new ArrayList<>();
@@ -15,6 +17,28 @@ public class UserDAO {
     //Add userData into users arraylist
     public UserData createUser(UserData userData) {
         this.users.add(userData);
+        return userData;
+    }
+
+    public UserData createUserSQL(UserData userData) throws DataAccessException {
+        String hashedPassword = hashPassword(userData.password());
+        System.out.println("request recieved");
+
+        String sqlQuery = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setString(1, userData.username());
+                preparedStatement.setString(2, hashedPassword);
+                preparedStatement.setString(3, userData.email());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("error");
+            System.out.println(e);
+            throw new RuntimeException(e);
+        }
+
         return userData;
     }
 
@@ -47,6 +71,16 @@ public class UserDAO {
 
     public boolean isEmpty() {
         return this.users.isEmpty();
+    }
+
+    //Used to hash password before adding to database
+    public static String hashPassword(String plainTextPassword) {
+        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
+    }
+
+    // compare the given password with the hashed one
+    public static boolean checkPassword(String plainTextPassword, String hashedPassword) {
+        return BCrypt.checkpw(plainTextPassword, hashedPassword);
     }
 
 
