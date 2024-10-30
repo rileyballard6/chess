@@ -30,7 +30,7 @@ public class UserService {
         UserData createdUser = userDAO.createUserSQL(newInfo);
 
         if (createdUser != null) {
-            return authDAO.createAuth(createdUser.username());
+            return authDAO.createAuthSQL(createdUser.username());
         } else {
             return null;
         }
@@ -45,8 +45,8 @@ public class UserService {
 
         UserData user = userDAO.getUserSQL(userInfo.username());
 
-        if (user.password().equals(userInfo.password())) {
-            return authDAO.createAuth(user.username());
+        if (checkPassword(userInfo.password(), user.password())) {
+            return authDAO.createAuthSQL(user.username());
         } else {
             return null;
         }
