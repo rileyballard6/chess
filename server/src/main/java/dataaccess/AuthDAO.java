@@ -92,13 +92,8 @@ public class AuthDAO {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
                 preparedStatement.setString(1, authToken);
-                var rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    UserData newData = new UserData(rs.getString("username"), null, null);
-                    return Objects.equals(newData.username(), authToken);
-                } else {
-                    return false;
-                }
+                preparedStatement.executeUpdate();
+                return true;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
