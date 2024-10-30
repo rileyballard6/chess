@@ -4,9 +4,15 @@ import model.AuthData;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 
 public class AuthDAO {
     private final ArrayList<AuthData> authTokens = new ArrayList<>();
+
 
     //Insert AuthData into array
     public AuthData createAuth(String username) {
