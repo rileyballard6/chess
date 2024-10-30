@@ -3,6 +3,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 
@@ -58,6 +59,11 @@ public class UserService {
         }
 
         return authDAO.deleteAuthData(authToken);
+    }
+
+    // compare the given password with the hashed one
+    public static boolean checkPassword(String plainTextPassword, String hashedPassword) {
+        return BCrypt.checkpw(plainTextPassword, hashedPassword);
     }
 
 }

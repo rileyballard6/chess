@@ -42,17 +42,18 @@ public class UserDAO {
     }
 
     //Loop through array to find user based on username, return user
-    public UserData getUser(String username) {
-        UserData user = null;
-        for (UserData currentUser : this.users) {
-            if (Objects.equals(currentUser.username(), username)) {
-                user = currentUser;
-                break;
-            }
-        }
-        return user;
-    }
+//    public UserData getUser(String username) {
+//        UserData user = null;
+//        for (UserData currentUser : this.users) {
+//            if (Objects.equals(currentUser.username(), username)) {
+//                user = currentUser;
+//                break;
+//            }
+//        }
+//        return user;
+//    }
 
+    //Executes a SQL statment to return info given a username, and turns it into a UserData object
     public UserData getUserSQL(String givenUsername) throws DataAccessException {
         String sqlQuery = "SELECT username, password, email FROM UserData WHERE username = ?";
 
@@ -78,15 +79,16 @@ public class UserDAO {
     }
 
     //Loop through array and if there is a matching username, return true
-    public boolean userExists(String username) {
-        for (UserData currentUser : this.users) {
-            if (Objects.equals(currentUser.username(), username)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean userExists(String username) {
+//        for (UserData currentUser : this.users) {
+//            if (Objects.equals(currentUser.username(), username)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
+    //Executes a SQL statement to see if a user is found from the UserData table
     public boolean userExistsSQL(String givenUsername) throws DataAccessException {
         String sqlQuery = "SELECT username FROM UserData WHERE username = ?";
 
@@ -119,11 +121,6 @@ public class UserDAO {
     //Used to hash password before adding to database
     public static String hashPassword(String plainTextPassword) {
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
-    }
-
-    // compare the given password with the hashed one
-    public static boolean checkPassword(String plainTextPassword, String hashedPassword) {
-        return BCrypt.checkpw(plainTextPassword, hashedPassword);
     }
 
 
