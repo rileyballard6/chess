@@ -2,6 +2,7 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
@@ -45,14 +46,14 @@ public class AuthDAO {
     }
 
     //Loop through array and return true if auth is found
-    public boolean findAuth(String authToken) {
-        for (AuthData currentAuth : authTokens) {
-            if (currentAuth.authToken().equals(authToken)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean findAuth(String authToken) {
+//        for (AuthData currentAuth : authTokens) {
+//            if (currentAuth.authToken().equals(authToken)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public boolean findAuthSQL(String authToken) throws DataAccessException {
         String sqlQuery = "SELECT authToken FROM AuthData WHERE authToken = ?";
@@ -84,6 +85,26 @@ public class AuthDAO {
         }
         return false;
     }
+
+    public boolean deleteAuthDataSQL(String authToken) throws DataAccessException {
+        String sqlQuery = "DELETE FROM AuthData WHERE authToken = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setString(1, authToken);
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    UserData newData = new UserData(rs.getString("username"), null, null);
+                    return Objects.equals(newData.username(), authToken);
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     //Loop through array and return the AuthData
     public AuthData getAuthData(String authToken) {
