@@ -21,6 +21,9 @@ public class ClearDataService {
         boolean authStatus = authDAO.clearAuth();
         boolean userStatus = userDAO.clearUsers();
         boolean gameStatus = gameDAO.clearGames();
+        System.out.println(authStatus);
+        System.out.println(userStatus);
+        System.out.println(gameStatus);
         return authStatus && userStatus && gameStatus;
     }
 }

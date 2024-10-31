@@ -11,6 +11,7 @@ import model.JoinGameData;
 
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GameService {
     private final AuthDAO authDAO;
@@ -55,21 +56,26 @@ public class GameService {
         if (!authDAO.findAuthSQL(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
-
-
+        System.out.println("test");
         AuthData user = authDAO.getAuthDataSQL(authToken);
 
         if (!gameDAO.gameExistsSQL(gameRequest.gameID())) {
             throw new DataAccessException("Game doesn't exist");
         }
 
+        System.out.println("test2");
 
-        if (gameRequest.playerColor() == null) {
+
+
+        if (!Objects.equals(gameRequest.playerColor(), "BLACK") &&
+                !Objects.equals(gameRequest.playerColor(), "WHITE")) {
+            System.out.println("test3");
             throw new DataAccessException("Team color is null");
+        } else {
+            return gameDAO.updateGameSQL(gameRequest, user);
         }
 
 
-        return gameDAO.updateGameSQL(gameRequest, user);
 
     }
 

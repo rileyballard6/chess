@@ -108,6 +108,7 @@ public class Handler {
     }
 
     public static Object gameHandler(Request req, Response res) throws DataAccessException {
+        System.out.println(req.body());
         String authToken = getAuthToken(req);
 
         if (req.requestMethod().equals("GET")) {
@@ -153,6 +154,8 @@ public class Handler {
 
     //Service checks authToken and joins a game, or throws an error if unauthorized
     public static Object gameHandlerPUT(Response res, String authToken, JoinGameData body ) throws DataAccessException {
+        System.out.println(body);
+        System.out.println(authToken);
         try {
             boolean gameJoined = GAME_SERVICE.joinGame(body, authToken);
             res.type("application/json");

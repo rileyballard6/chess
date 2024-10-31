@@ -106,7 +106,6 @@ public class GameDAO {
         } else if (game.blackUsername() == null && Objects.equals(gameRequest.playerColor(), "BLACK")) {
             return addPlayerToGameSQL(game, playerAuth, "BLACK");
         }
-        System.out.println("That didnt work...");
 
         return false;
     }
