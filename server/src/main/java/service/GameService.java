@@ -56,15 +56,23 @@ public class GameService {
             throw new DataAccessException("Unauthorized");
         }
 
+        System.out.println("Made it here...");
+
+
         AuthData user = authDAO.getAuthDataSQL(authToken);
 
-        if (!gameDAO.gameExists(gameRequest.gameID())) {
+        if (!gameDAO.gameExistsSQL(gameRequest.gameID())) {
             throw new DataAccessException("Game doesn't exist");
         }
+
+        System.out.println("Hmmm");
+
 
         if (gameRequest.playerColor() == null) {
             throw new DataAccessException("Team color is null");
         }
+
+        System.out.println("I got here!!");
 
         return gameDAO.updateGame(gameRequest, user);
 

@@ -17,13 +17,13 @@ public class GameDAO {
     private final ArrayList<GameData> gameData = new ArrayList<>();
 
     //Generate randomID, assign it to game and add it to arraylist
-    public int createGame(GameData game) {
-        Random rand = new Random();
-        game = game.addId(rand.nextInt(1000));
-        gameData.add(game);
-
-        return game.gameID();
-    }
+//    public int createGame(GameData game) {
+//        Random rand = new Random();
+//        game = game.addId(rand.nextInt(1000));
+//        gameData.add(game);
+//
+//        return game.gameID();
+//    }
 
     public int createGameSQL(GameData game) throws DataAccessException {
         Random rand = new Random();
@@ -51,9 +51,9 @@ public class GameDAO {
     }
 
     //Return array list
-    public ArrayList<GameData> getGames() {
-        return gameData;
-    }
+//    public ArrayList<GameData> getGames() {
+//        return gameData;
+//    }
 
     public ArrayList<GameData> getGamesSQL() throws DataAccessException {
         String sqlQuery = "SELECT * FROM GameData";
@@ -63,14 +63,11 @@ public class GameDAO {
             try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
                 var rs = preparedStatement.executeQuery();
                 while (rs.next()) {
-                    String chessGame = rs.getString("game");
-//                    GameData newData = new GameData(rs.getString("gameID"),
-//                            rs.getString("whiteUsername"),
-//                            rs.getString("blackUsername"),
-//                            rs.getString("gameName"),
-//                            rs.getString("game"));
-
-                    System.out.println(chessGame);
+                    GameData newData = new GameData(rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            rs.getString("gameName"), null);
+                    allGames.add(newData);
                 }
                 return allGames;
             }
@@ -78,8 +75,6 @@ public class GameDAO {
             throw new RuntimeException(e);
         }
     }
-
-
 
     //Loop through array and find requested game with ID, return true if found
     public boolean gameExists(int gameID) {
@@ -89,6 +84,20 @@ public class GameDAO {
             }
         }
         return false;
+    }
+
+    public boolean gameExistsSQL(int gameID) throws DataAccessException {
+        String sqlQuery = "SELECT gameID FROM GameData where gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setInt(1, gameID);
+                var rs = preparedStatement.executeQuery();
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //Loop through array and update the GameData with username in place of team
