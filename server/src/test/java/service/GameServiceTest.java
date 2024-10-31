@@ -35,7 +35,7 @@ public class GameServiceTest {
         GameData newGame = new GameData(0, null, null, "gameName", null);
 
         int gameId = gameService.createGame(newGame, authData.authToken());
-        ArrayList<GameData> games = testGameDAO.getGames();
+        ArrayList<GameData> games = testGameDAO.getGamesSQL();
 
         assertInstanceOf(Integer.class, gameId, "value not an int");
         assertFalse(games.isEmpty());

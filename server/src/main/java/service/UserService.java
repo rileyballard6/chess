@@ -58,6 +58,7 @@ public class UserService {
             throw new DataAccessException("Unauthorized");
         }
 
+
         return authDAO.deleteAuthDataSQL(authToken);
     }
 

@@ -17,14 +17,6 @@ public class AuthDAO {
     private final ArrayList<AuthData> authTokens = new ArrayList<>();
 
 
-    //Insert AuthData into array
-//    public AuthData createAuth(String username) {
-//        String newAuthToken = generateToken();
-//        AuthData newAuthData = new AuthData(newAuthToken, username);
-//        authTokens.add(newAuthData);
-//        return newAuthData;
-//    }
-
     //Creates AuthData object and runs a SQL statement to insert it into the AuthData table
     public AuthData createAuthSQL(String username) {
         String newAuthToken = generateToken();
@@ -45,15 +37,6 @@ public class AuthDAO {
 
     }
 
-    //Loop through array and return true if auth is found
-//    public boolean findAuth(String authToken) {
-//        for (AuthData currentAuth : authTokens) {
-//            if (currentAuth.authToken().equals(authToken)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
     public boolean findAuthSQL(String authToken) throws DataAccessException {
         String sqlQuery = "SELECT authToken FROM AuthData WHERE authToken = ?";
@@ -74,17 +57,6 @@ public class AuthDAO {
         }
     }
 
-    //Loop through array and return true when AuthData is removed
-//    public boolean deleteAuthData(String authToken) {
-//        for (int i = 0; i < authTokens.size(); i++) {
-//            AuthData currentAuth = authTokens.get(i);
-//            if (currentAuth.authToken().equals(authToken)) {
-//                authTokens.remove(i);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
     public boolean deleteAuthDataSQL(String authToken) throws DataAccessException {
         String sqlQuery = "DELETE FROM AuthData WHERE authToken = ?";
@@ -92,23 +64,15 @@ public class AuthDAO {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
                 preparedStatement.setString(1, authToken);
-                preparedStatement.executeUpdate();
-                return true;
+
+                int rowsAffected = preparedStatement.executeUpdate();
+
+                return rowsAffected > 0;
             }
         } catch (SQLException e) {
             return false;
         }
-    }
 
-
-    //Loop through array and return the AuthData
-    public AuthData getAuthData(String authToken) {
-        for (AuthData currentAuth : authTokens) {
-            if (currentAuth.authToken().equals(authToken)) {
-                return currentAuth;
-            }
-        }
-        return null;
     }
 
     public AuthData getAuthDataSQL(String authToken) throws DataAccessException {
@@ -133,10 +97,65 @@ public class AuthDAO {
 
     }
 
-    public boolean clearAuth() {
-        this.authTokens.clear();
-        return true;
+    public boolean clearAuth() throws DataAccessException {
+        String sqlQuery = "DELETE FROM AuthData";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
     }
+
+    /**
+     * BELOW ARE NON SQL FUNCTIONS FOR DATA ACCESS
+     * */
+
+
+    //Insert AuthData into array
+    public AuthData createAuth(String username) {
+        String newAuthToken = generateToken();
+        AuthData newAuthData = new AuthData(newAuthToken, username);
+        authTokens.add(newAuthData);
+        return newAuthData;
+    }
+
+    //Loop through array and return true if auth is found
+    public boolean findAuth(String authToken) {
+        for (AuthData currentAuth : authTokens) {
+            if (currentAuth.authToken().equals(authToken)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //Loop through array and return true when AuthData is removed
+    public boolean deleteAuthData(String authToken) {
+        for (int i = 0; i < authTokens.size(); i++) {
+            AuthData currentAuth = authTokens.get(i);
+            if (currentAuth.authToken().equals(authToken)) {
+                authTokens.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //Loop through array and return the AuthData
+    public AuthData getAuthData(String authToken) {
+        for (AuthData currentAuth : authTokens) {
+            if (currentAuth.authToken().equals(authToken)) {
+                return currentAuth;
+            }
+        }
+        return null;
+    }
+
 
     public boolean isEmpty() {
         return authTokens.isEmpty();
