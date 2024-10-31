@@ -115,12 +115,61 @@ public class GameDAO {
                     return false;
                 }
                 gameData.set(i, game);
-                System.out.println(game);
                 return true;
-
             }
         }
         return false;
+    }
+
+    public boolean updateGameSQL(JoinGameData gameRequest, AuthData playerAuth) throws DataAccessException {
+        String sqlQuery = "SELECT gameID, whiteUsername, blackUsername FROM GameData WHERE gameID = ?";
+        GameData game = null;
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setInt(1, gameRequest.gameID());
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    game = new GameData(rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            null, null);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(game);
+        System.out.println(gameRequest);
+
+        if (game.whiteUsername() == null && Objects.equals(gameRequest.playerColor(), "WHITE")) {
+            return addPlayerToGameSQL(game, playerAuth, "WHITE");
+        } else if (game.blackUsername() == null && Objects.equals(gameRequest.playerColor(), "BLACK")) {
+            return addPlayerToGameSQL(game, playerAuth, "BLACK");
+        }
+        System.out.println("That didnt work...");
+
+        return false;
+    }
+
+    public boolean addPlayerToGameSQL(GameData game, AuthData authData, String color) throws DataAccessException {
+        String sqlQuery = Objects.equals(color, "WHITE")
+                ? "UPDATE GameData SET whiteUsername = ? WHERE gameID = ?"
+                : "UPDATE GameData SET blackUsername = ? WHERE gameID = ?";
+        System.out.println(authData);
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setString(1, authData.username());
+                preparedStatement.setInt(2, game.gameID());
+                preparedStatement.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+            return false;
+        }
     }
 
     public boolean clearGames() {

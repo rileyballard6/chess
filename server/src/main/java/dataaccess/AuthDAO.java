@@ -119,7 +119,7 @@ public class AuthDAO {
                 preparedStatement.setString(1, authToken);
                 var rs = preparedStatement.executeQuery();
                 if (rs.next()) {
-                    AuthData newData = new AuthData(rs.getString("username"), rs.getString("authToken"));
+                    AuthData newData = new AuthData(rs.getString("authToken"), rs.getString("username"));
                     System.out.println(newData);
                     return newData;
                 } else {
