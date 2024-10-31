@@ -185,7 +185,7 @@ public class Handler {
                 res.status(500);
                 return "{ \"message\": \"Error: Database error\" }";
             }
-        } catch (Error e) {
+        } catch (DataAccessException e) {
             res.status(500);
             return "{ \"message\": \"Error: Database error\" }";
         }

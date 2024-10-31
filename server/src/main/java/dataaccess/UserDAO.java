@@ -109,9 +109,17 @@ public class UserDAO {
     }
 
 
-    public boolean clearUsers() {
-        this.users.clear();
-        return true;
+    public boolean clearUsers() throws DataAccessException {
+        String sqlQuery = "DELETE FROM UserData";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public boolean isEmpty() {

@@ -63,8 +63,8 @@ public class AuthDAO {
                 preparedStatement.setString(1, authToken);
                 var rs = preparedStatement.executeQuery();
                 if (rs.next()) {
-                    UserData newData = new UserData(rs.getString("username"), null, null);
-                    return Objects.equals(newData.username(), authToken);
+                    AuthData newData = new AuthData(rs.getString("authToken"), null);
+                    return Objects.equals(newData.authToken(), authToken);
                 } else {
                     return false;
                 }
@@ -75,16 +75,16 @@ public class AuthDAO {
     }
 
     //Loop through array and return true when AuthData is removed
-    public boolean deleteAuthData(String authToken) {
-        for (int i = 0; i < authTokens.size(); i++) {
-            AuthData currentAuth = authTokens.get(i);
-            if (currentAuth.authToken().equals(authToken)) {
-                authTokens.remove(i);
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean deleteAuthData(String authToken) {
+//        for (int i = 0; i < authTokens.size(); i++) {
+//            AuthData currentAuth = authTokens.get(i);
+//            if (currentAuth.authToken().equals(authToken)) {
+//                authTokens.remove(i);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public boolean deleteAuthDataSQL(String authToken) throws DataAccessException {
         String sqlQuery = "DELETE FROM AuthData WHERE authToken = ?";
@@ -96,7 +96,7 @@ public class AuthDAO {
                 return true;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return false;
         }
     }
 
@@ -109,6 +109,28 @@ public class AuthDAO {
             }
         }
         return null;
+    }
+
+    public AuthData getAuthDataSQL(String authToken) throws DataAccessException {
+        String sqlQuery = "SELECT username, authToken FROM AuthData WHERE authToken = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setString(1, authToken);
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    AuthData newData = new AuthData(rs.getString("username"), rs.getString("authToken"));
+                    System.out.println(newData);
+                    return newData;
+                } else {
+                    return null;
+                }
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public boolean clearAuth() {

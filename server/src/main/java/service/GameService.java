@@ -24,23 +24,23 @@ public class GameService {
     //Check if auth token is valid, then assign game to data and send it to Data Access for storage
     //Data access will send back the gameID generated
     public int createGame(GameData initialData, String authToken) throws DataAccessException {
-        if (!authDAO.findAuth(authToken)) {
+        if (!authDAO.findAuthSQL(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
 
         GameData newGame = initialData.addGame();
-        return gameDAO.createGame(newGame);
+        return gameDAO.createGameSQL(newGame);
 
     }
 
     //Checks Auth Token, then Retrieves a list of all the games from DataAccess,
     // then filters out the actual ChessGame Object
     public ArrayList<GameData> getAllGames(String authToken) throws DataAccessException {
-        if (!authDAO.findAuth(authToken)) {
+        if (!authDAO.findAuthSQL(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
 
-        ArrayList<GameData> allGames = gameDAO.getGames();
+        ArrayList<GameData> allGames = gameDAO.getGamesSQL();
         ArrayList<GameData> filteredGames = new ArrayList<>();
 
         for (GameData game : allGames) {
@@ -52,11 +52,11 @@ public class GameService {
 
     //Checks authToken first, throws error if invalid. Gets auth data, checks if game exists, updates game
     public boolean joinGame(JoinGameData gameRequest, String authToken) throws DataAccessException {
-        if (!authDAO.findAuth(authToken)) {
+        if (!authDAO.findAuthSQL(authToken)) {
             throw new DataAccessException("Unauthorized");
         }
 
-        AuthData user = authDAO.getAuthData(authToken);
+        AuthData user = authDAO.getAuthDataSQL(authToken);
 
         if (!gameDAO.gameExists(gameRequest.gameID())) {
             throw new DataAccessException("Game doesn't exist");

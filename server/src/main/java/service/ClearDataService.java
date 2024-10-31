@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 
@@ -16,7 +17,7 @@ public class ClearDataService {
     }
 
     //Accesses the clear method on each data access object. Removes all elements from data structure
-    public boolean clearAllData() {
+    public boolean clearAllData() throws DataAccessException {
         boolean authStatus = authDAO.clearAuth();
         boolean userStatus = userDAO.clearUsers();
         boolean gameStatus = gameDAO.clearGames();

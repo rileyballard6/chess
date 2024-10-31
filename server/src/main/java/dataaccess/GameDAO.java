@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.*;
 
 public class GameDAO {
@@ -23,10 +25,61 @@ public class GameDAO {
         return game.gameID();
     }
 
+    public int createGameSQL(GameData game) throws DataAccessException {
+        Random rand = new Random();
+        game = game.addId(rand.nextInt(1000));
+
+        Gson gson = new Gson();
+        String gameJson = gson.toJson(game.game());
+        String sqlQuery = "INSERT INTO GameData " +
+                "(gameID, whiteUsername, blackUsername, gameName, game) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setInt(1, game.gameID());
+                preparedStatement.setString(2, game.whiteUsername());
+                preparedStatement.setString(3, game.blackUsername());
+                preparedStatement.setString(4, game.gameName());
+                preparedStatement.setString(5, gameJson);
+                preparedStatement.executeUpdate();
+                return game.gameID();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //Return array list
     public ArrayList<GameData> getGames() {
         return gameData;
     }
+
+    public ArrayList<GameData> getGamesSQL() throws DataAccessException {
+        String sqlQuery = "SELECT * FROM GameData";
+        ArrayList<GameData> allGames = new ArrayList<>();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                var rs = preparedStatement.executeQuery();
+                while (rs.next()) {
+                    String chessGame = rs.getString("game");
+//                    GameData newData = new GameData(rs.getString("gameID"),
+//                            rs.getString("whiteUsername"),
+//                            rs.getString("blackUsername"),
+//                            rs.getString("gameName"),
+//                            rs.getString("game"));
+
+                    System.out.println(chessGame);
+                }
+                return allGames;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     //Loop through array and find requested game with ID, return true if found
     public boolean gameExists(int gameID) {

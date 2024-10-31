@@ -58,7 +58,7 @@ public class UserService {
             throw new DataAccessException("Unauthorized");
         }
 
-        return authDAO.deleteAuthData(authToken);
+        return authDAO.deleteAuthDataSQL(authToken);
     }
 
     // compare the given password with the hashed one
