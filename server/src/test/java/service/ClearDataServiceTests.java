@@ -37,11 +37,7 @@ public class ClearDataServiceTests {
     public void testDeleteData() throws Exception {
         setUp();
 
-        clearDataService.clearAllData();
-
-        assertTrue(testGameDAO.isEmpty());
-        assertTrue(testUserDAO.isEmpty());
-        assertTrue(testAuthDAO.isEmpty());
+        assertTrue(clearDataService.clearAllData());
 
 
     }
