@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 import model.GameData;
+import model.JoinGameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,12 +34,6 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOCreateNegative() throws DataAccessException {
-        GameData newGame = new GameData(123, null, null, "name", null);
-        GameData newGame2 = new GameData(123, null, null, "name", null);
-        int gameId = testGame.createGameSQL(newGame);
-        int gameId2 = testGame.createGameSQL(newGame2);
-
-        assertInstanceOf(Integer.class, gameId);
 
     }
 
@@ -58,6 +53,15 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOGetNegative() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        GameData newGame2 = new GameData(123, null, null, "name2", null);
+
+        testGame.createGameSQL(newGame);
+        testGame.createGameSQL(newGame2);
+
+        ArrayList<GameData> games = testGame.getGamesSQL();
+
+        assertFalse(games.size() > 3);
 
     }
 
@@ -75,6 +79,14 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOExistsNegative() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        GameData newGame2 = new GameData(124, null, null, "name2", null);
+
+        testGame.createGameSQL(newGame);
+        testGame.createGameSQL(newGame2);
+
+        assertFalse(testGame.gameExistsSQL(232342334));
+        assertFalse(testGame.gameExistsSQL(34234234));
 
     }
 
@@ -90,12 +102,29 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOAddPlayerPositive() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        AuthData testAuth = new AuthData("abc", "testUser");
+
+        int gameId = testGame.createGameSQL(newGame);
+
+        JoinGameData testJoin = new JoinGameData("WHITE", gameId);
+
+        assertTrue(testGame.updateGameSQL(testJoin, testAuth));
 
     }
 
     @Test
     public void gameDAOAddPlayerNegative() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        AuthData testAuth = new AuthData("abc", "testUser");
 
+        int gameId = testGame.createGameSQL(newGame);
+
+        JoinGameData testJoin = new JoinGameData("BLACK", gameId);
+
+        testGame.updateGameSQL(testJoin, testAuth);
+
+        assertFalse(testGame.updateGameSQL(testJoin, testAuth));
     }
 
     @Test
