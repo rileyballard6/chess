@@ -33,23 +33,48 @@ public class UserDAOTests {
 
 
     @Test
-    public void userDAOGetUserPositive() {
+    public void userDAOGetUserPositive() throws DataAccessException {
+        UserData newUser = new UserData("test", "testpassword", "testemail");
+
+        testDAO.createUserSQL(newUser);
+
+        UserData foundUser = testDAO.getUserSQL(newUser.username());
+
+        assertEquals(foundUser.username(), newUser.username());
+        assertEquals(foundUser.email(), newUser.email());
 
     }
 
     @Test
-    public void userDAOGetUserNegative() {
+    public void userDAOGetUserNegative() throws DataAccessException {
+        UserData newUser = new UserData("test", "testpassword", "testemail");
+
+        testDAO.createUserSQL(newUser);
+
+        UserData foundUser = testDAO.getUserSQL("wrongUser");
+
+        assertNull(foundUser);
 
     }
 
     @Test
-    public void userDAOExistsPositive() {
+    public void userDAOExistsPositive() throws DataAccessException {
+        UserData newUser = new UserData("test", "testpassword", "testemail");
 
+        testDAO.createUserSQL(newUser);
+        Boolean existsSQL = testDAO.userExistsSQL(newUser.username());
+
+        assertTrue(existsSQL);
     }
 
     @Test
-    public void userDAOExistsNegative() {
+    public void userDAOExistsNegative() throws DataAccessException {
+        UserData newUser = new UserData("test", "testpassword", "testemail");
 
+        testDAO.createUserSQL(newUser);
+        Boolean existsSQL = testDAO.userExistsSQL("wrongUser");
+
+        assertFalse(existsSQL);
     }
 
     @Test
