@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import service.ClearDataService;
 import service.GameService;
 import service.UserService;
@@ -22,6 +19,7 @@ public class Handler {
     private static final UserService USER_SERVICE = new UserService(USER_DAO, AUTH_DAO);
     private static final GameService GAME_SERVICE = new GameService(AUTH_DAO, GAME_DAO);
     private static final ClearDataService CLEAR_SERVICE = new ClearDataService(USER_DAO, AUTH_DAO, GAME_DAO);
+
 
     //Service will throw an error if the user already exists or if an
     // input field is null, if not, returns AuthData

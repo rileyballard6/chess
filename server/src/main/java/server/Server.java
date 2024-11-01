@@ -1,9 +1,14 @@
 package server;
 
+import java.sql.SQLException;
 import java.util.UUID;
 import chess.ChessGame;
 import chess.ChessPiece;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import spark.*;
+
+import javax.xml.crypto.Data;
 
 
 public class Server {
@@ -18,6 +23,41 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        try {
+            DatabaseManager.createDatabase();
+            try (var conn = DatabaseManager.getConnection()) {
+
+                String createUserDataTable = "CREATE TABLE IF NOT EXISTS UserData (" +
+                        "username VARCHAR(50) PRIMARY KEY, " +
+                        "password VARCHAR(255) NOT NULL, " +
+                        "email VARCHAR(100) NOT NULL);";
+
+                String createGameDataTable = "CREATE TABLE IF NOT EXISTS GameData (" +
+                        "gameID INT AUTO_INCREMENT PRIMARY KEY, " +
+                        "whiteUsername VARCHAR(50), " +
+                        "blackUsername VARCHAR(50), " +
+                        "gameName VARCHAR(100), " +
+                        "game JSON);";
+
+                String createAuthDataTable = "CREATE TABLE IF NOT EXISTS AuthData (" +
+                        "authToken VARCHAR(255) PRIMARY KEY, " +
+                        "username VARCHAR(50));";
+
+
+                // Execute table creation statements
+                try (var stmt = conn.createStatement()) {
+                    stmt.executeUpdate(createUserDataTable);
+                    stmt.executeUpdate(createGameDataTable);
+                    stmt.executeUpdate(createAuthDataTable);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (DataAccessException e) {
+            System.out.println("Error creating database or tables: " + e);
+        }
+
 
         //Register new user
         Spark.post("/user", Handler::registerHandler);
