@@ -92,12 +92,26 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOUpdatePositive() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        AuthData testAuth = new AuthData("abc", "testUser");
 
+        int gameId = testGame.createGameSQL(newGame);
+
+        JoinGameData testJoin = new JoinGameData("WHITE", gameId);
+
+        assertTrue(testGame.updateGameSQL(testJoin, testAuth));
     }
 
     @Test
     public void gameDAOUpdateNegative() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        AuthData testAuth = new AuthData("abc", "testUser");
 
+        int gameId = testGame.createGameSQL(newGame);
+
+        JoinGameData testJoin = new JoinGameData("GOLD", gameId);
+
+        assertFalse(testGame.updateGameSQL(testJoin, testAuth));
     }
 
     @Test
