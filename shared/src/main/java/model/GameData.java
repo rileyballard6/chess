@@ -15,12 +15,4 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         return new GameData(gameID, whiteUsername, blackUsername, gameName, null);
     }
 
-    public GameData addPlayerBlack(String username) {
-        return new GameData(gameID, whiteUsername, username, gameName, game);
-
-    }
-    public GameData addPlayerWhite(String username) {
-        return new GameData(gameID, username, blackUsername, gameName, game);
-
-    }
 }
