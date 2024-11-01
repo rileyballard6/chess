@@ -98,8 +98,6 @@ public class GameDAO {
             throw new RuntimeException(e);
         }
 
-        System.out.println(game);
-        System.out.println(gameRequest);
 
         if (game.whiteUsername() == null && Objects.equals(gameRequest.playerColor(), "WHITE")) {
             return addPlayerToGameSQL(game, playerAuth, "WHITE");
@@ -114,7 +112,6 @@ public class GameDAO {
         String sqlQuery = Objects.equals(color, "WHITE")
                 ? "UPDATE GameData SET whiteUsername = ? WHERE gameID = ?"
                 : "UPDATE GameData SET blackUsername = ? WHERE gameID = ?";
-        System.out.println(authData);
 
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
@@ -124,7 +121,6 @@ public class GameDAO {
                 return true;
             }
         } catch (SQLException e) {
-            System.out.println(e);
             return false;
         }
     }
