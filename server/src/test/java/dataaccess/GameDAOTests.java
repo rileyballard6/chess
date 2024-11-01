@@ -34,7 +34,14 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOCreateNegative() throws DataAccessException {
+        GameData newGame = new GameData(123, null, null, "name", null);
+        int gameId = testGame.createGameSQL(newGame);
 
+        assertInstanceOf(Integer.class, gameId);
+
+        ArrayList<GameData> allGames = testGame.getGamesSQL();
+
+        assertFalse(allGames.isEmpty());
     }
 
     @Test
