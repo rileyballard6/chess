@@ -45,38 +45,76 @@ public class AuthDAOTests {
 
 
     @Test
-    public void authDAOFindPositive() {
+    public void authDAOFindPositive() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
+
+        AuthData data = testAuth.createAuthSQL(user.username());
+
+        assertTrue(testAuth.findAuthSQL(data.authToken()));
 
     }
 
     @Test
-    public void authDAOFindNegative() {
+    public void authDAOFindNegative() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
+
+        AuthData data = testAuth.createAuthSQL(user.username());
+
+        assertFalse(testAuth.findAuthSQL(data.username()));
 
     }
 
     @Test
-    public void authDAODeletePositive() {
+    public void authDAODeletePositive() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
+
+        AuthData data = testAuth.createAuthSQL(user.username());
+
+        assertTrue(testAuth.deleteAuthDataSQL(data.authToken()));
+        assertFalse(testAuth.findAuthSQL(data.username()));
+    }
+
+    @Test
+    public void authDAODeleteNegative() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
+
+        AuthData data = testAuth.createAuthSQL(user.username());
+
+        testAuth.deleteAuthDataSQL(data.authToken());
+
+        assertFalse(testAuth.deleteAuthDataSQL(data.authToken()));
+    }
+
+    @Test
+    public void authDAOGetPositive() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
+
+        AuthData test = testAuth.createAuthSQL(user.username());
+        AuthData data = testAuth.getAuthDataSQL(test.authToken());
+
+        assertInstanceOf(AuthData.class, data);
+        assertInstanceOf(String.class, data.authToken());
 
     }
 
     @Test
-    public void authDAODeleteNegative() {
+    public void authDAOGetNegative() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
 
+        AuthData test = testAuth.createAuthSQL(user.username());
+        testAuth.deleteAuthDataSQL(test.authToken());
+        AuthData data = testAuth.getAuthDataSQL(test.authToken());
+
+        assertNull(data);
     }
 
     @Test
-    public void authDAOGetPositive() {
+    public void authDAOClearPositive() throws DataAccessException {
+        testAuth.createAuthSQL("test1");
+        testAuth.createAuthSQL("test2");
+        testAuth.createAuthSQL("test3");
 
-    }
-
-    @Test
-    public void authDAOGetNegative() {
-
-    }
-
-    @Test
-    public void authDAOClearPositive() {
-
+        assertTrue(testAuth.clearAuth());
     }
 
 

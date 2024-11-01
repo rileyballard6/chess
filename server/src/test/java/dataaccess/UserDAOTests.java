@@ -91,6 +91,5 @@ public class UserDAOTests {
         assertFalse(testDAO.userExistsSQL("test"));
         assertFalse(testDAO.userExistsSQL("test2"));
 
-
     }
 }
