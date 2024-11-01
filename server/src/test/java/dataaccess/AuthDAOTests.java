@@ -1,18 +1,48 @@
 package dataaccess;
 
+import model.AuthData;
+import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLIntegrityConstraintViolationException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthDAOTests {
 
-    @Test
-    public void authDAOCreatePositive() {
+    AuthDAO testAuth = new AuthDAO();
+    UserDAO testUser = new UserDAO();
 
+    @BeforeEach
+    public void setUp() throws DataAccessException {
+        testAuth.clearAuth();
+        testUser.clearUsers();
+
+        UserData newUser = new UserData("test", "test", "test");
+        testUser.createUserSQL(newUser);
     }
 
     @Test
-    public void authDAOCreateNegative() {
+    public void authDAOCreatePositive() throws DataAccessException {
+        UserData user = testUser.getUserSQL("test");
 
+        AuthData newAuth = testAuth.createAuthSQL(user.username());
+
+        assertInstanceOf(String.class, newAuth.authToken());
+        assertInstanceOf(AuthData.class, newAuth);
     }
+
+
+    @Test
+    public void authDAOCreateNegative() throws RuntimeException, DataAccessException {
+        UserData user = testUser.getUserSQL("test");
+
+        AuthData data = testAuth.createAuthSQL(user.username());
+
+        assertNotNull(data.authToken());
+    }
+
 
     @Test
     public void authDAOFindPositive() {

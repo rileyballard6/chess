@@ -78,7 +78,19 @@ public class UserDAOTests {
     }
 
     @Test
-    public void userDAOClearPositive() {
+    public void userDAOClearPositive() throws DataAccessException {
+        UserData newUser = new UserData("test", "testpassword", "testemail");
+        UserData newUser2 = new UserData("test2", "testpassword", "testemail2");
+        UserData newUser3 = new UserData("test3", "testpassword", "testemail3");
+
+        testDAO.createUserSQL(newUser);
+        testDAO.createUserSQL(newUser2);
+        testDAO.createUserSQL(newUser3);
+
+        assertTrue(testDAO.clearUsers());
+        assertFalse(testDAO.userExistsSQL("test"));
+        assertFalse(testDAO.userExistsSQL("test2"));
+
 
     }
 }
