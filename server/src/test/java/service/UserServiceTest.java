@@ -15,6 +15,12 @@ public class UserServiceTest {
     private final AuthDAO testAuthDAO = new AuthDAO();
     private final UserService userService = new UserService(testUserDAO, testAuthDAO);
 
+    @BeforeEach
+    public void setUp() throws DataAccessException {
+        testUserDAO.clearUsers();
+        testAuthDAO.clearAuth();
+    }
+
 
     @Test
     @DisplayName("Register User test")

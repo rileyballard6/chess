@@ -20,6 +20,10 @@ public class GameServiceTest {
     private final GameService gameService = new GameService(testAuthDAO, testGameDAO);
 
     public AuthData setUp() throws DataAccessException {
+        testUserDAO.clearUsers();
+        testAuthDAO.clearAuth();
+        testGameDAO.clearGames();
+
         UserData testData = new UserData("testLogin", "testPassword", "testEmail");
         userService.registerNewUser(testData);
         UserData loginTest = new UserData("testLogin", "testPassword", null);
