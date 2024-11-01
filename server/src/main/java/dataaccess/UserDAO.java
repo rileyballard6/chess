@@ -17,7 +17,6 @@ public class UserDAO {
 
     //Add userData into sql server UserData table (first hash the password)
     public UserData createUserSQL(UserData userData) throws DataAccessException {
-        System.out.println("uhh");
         String hashedPassword = hashPassword(userData.password());
 
         String sqlQuery = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
