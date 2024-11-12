@@ -26,9 +26,14 @@ public class Repl {
         return scanner.nextLine().trim().toLowerCase();
     }
 
-    private void evaluateInput(String command) {
-        String[] commandArray = command.split(" ");
-        switch (commandArray[0]) {
+    private void evaluateInput(String input) {
+        String[] inputArray = input.split(" ");
+        switch (inputArray[0]) {
+            case "register":
+                String response = preLoginClient.registerClient(inputArray);
+                System.out.println(response);
+                loggedIn = true;
+                break;
             case "help":
                 printHelp();
                 break;
