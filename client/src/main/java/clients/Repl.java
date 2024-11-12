@@ -7,6 +7,9 @@ public class Repl {
     private boolean loggedIn = false;
     private boolean running = true;
 
+    final private preLoginClient preLoginClient = new preLoginClient();
+    final private postLoginClient postLoginClient = new postLoginClient();
+
     public void run() {
         while (running) {
             String command = readInput();
@@ -24,7 +27,8 @@ public class Repl {
     }
 
     private void evaluateInput(String command) {
-        switch (command) {
+        String[] commandArray = command.split(" ");
+        switch (commandArray[0]) {
             case "help":
                 printHelp();
                 break;
