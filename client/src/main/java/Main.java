@@ -1,8 +1,12 @@
 import chess.*;
+import clients.Repl;
 
 public class Main {
+
+    static final Repl repl = new Repl();
+
     public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        System.out.println("♕ Welcome to CS 240 Chess, type 'help' to get started");
+        repl.run();
     }
 }
