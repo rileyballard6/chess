@@ -8,8 +8,6 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import spark.*;
 
-import javax.xml.crypto.Data;
-
 
 public class Server {
 

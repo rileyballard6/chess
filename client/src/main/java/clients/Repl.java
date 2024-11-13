@@ -1,5 +1,8 @@
 package clients;
 
+import model.AuthData;
+
+import java.net.URISyntaxException;
 import java.util.Scanner;
 
 public class Repl {
@@ -10,7 +13,12 @@ public class Repl {
     final private preLoginClient preLoginClient = new preLoginClient();
     final private postLoginClient postLoginClient = new postLoginClient();
 
-    public void run() {
+    AuthData userAuth = null;
+
+    public Repl() throws URISyntaxException {
+    }
+
+    public void run() throws Exception {
         while (running) {
             String command = readInput();
             evaluateInput(command);
@@ -26,7 +34,7 @@ public class Repl {
         return scanner.nextLine().trim().toLowerCase();
     }
 
-    private void evaluateInput(String input) {
+    private void evaluateInput(String input) throws Exception {
         String[] inputArray = input.split(" ");
         switch (inputArray[0]) {
             case "register":
