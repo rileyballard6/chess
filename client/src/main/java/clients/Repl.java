@@ -13,8 +13,6 @@ public class Repl {
     final private preLoginClient preLoginClient = new preLoginClient();
     final private postLoginClient postLoginClient = new postLoginClient();
 
-    AuthData userAuth = null;
-
     public Repl() throws URISyntaxException {
     }
 
@@ -47,37 +45,16 @@ public class Repl {
         switch (inputArray[0]) {
             case "register":
                 Object registerResponse = preLoginClient.registerClient(inputArray);
-                if (registerResponse == null) {
-                    System.out.println("Unable to login user at this time.");
-                } else if (registerResponse instanceof AuthData) {
-                    AuthData authData = (AuthData) registerResponse;
-                    System.out.println(authData.username() + " logged in.");
-                    userAuth = authData;
-                    loggedIn = true;
-                } else if (registerResponse instanceof String) {
-                    System.out.println((String) registerResponse);
-                }
+                printAuthResult(registerResponse);
                 break;
-
             case "login":
                 Object loginResponse = preLoginClient.loginClient(inputArray);
-
-                if (loginResponse == null) {
-                    System.out.println("Unable to login user at this time.");
-                } else if (loginResponse instanceof AuthData) {
-                    AuthData authData = (AuthData) loginResponse;
-                    System.out.println(authData.username() + " logged in.");
-                    userAuth = authData;
-                    loggedIn = true;
-                } else if (loginResponse instanceof String) {
-                    System.out.println((String) loginResponse);
-                }
+                printAuthResult(loginResponse);
                 break;
             case "help":
                 printHelp();
                 break;
             case "quit":
-            case "exit":
                 quit();
                 break;
             case "":
@@ -104,6 +81,19 @@ public class Repl {
             System.out.println("- login <USERNAME> <PASSWORD>             : log in and play chess");
             System.out.println("- quit                                    : stop playing chess");
             System.out.println("- help                                    : view possible commands");
+        }
+    }
+
+    private void printAuthResult(Object response) {
+        if (response == null) {
+            System.out.println("Unable to login user at this time.");
+        } else if (response instanceof AuthData) {
+            AuthData authData = (AuthData) response;
+            System.out.println(authData.username() + " logged in.");
+            postLoginClient.setAuthToken(authData.authToken());
+            loggedIn = true;
+        } else if (response instanceof String) {
+            System.out.println((String) response);
         }
     }
 
