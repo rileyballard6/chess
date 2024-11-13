@@ -41,6 +41,11 @@ public class Repl {
         switch (inputArray[0]) {
             case "logout":
                 Object logoutResponse = postLoginClient.logoutClient();
+                System.out.println(logoutResponse);
+                if (logoutResponse == "User logged out successfully") {
+                    loggedIn = false;
+                    postLoginClient.setAuthToken(null);
+                }
                 break;
             case "create":
                 break;

@@ -57,20 +57,12 @@ public class ServerFacade {
         return response.toString();
     }
 
-    public String makeDeleteRequest(URL url, Object data) throws Exception {
+    public String makeDeleteRequest(URL url, String authToken) throws Exception {
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("DELETE");
         http.setRequestProperty("Content-Type", "application/json; utf-8");
+        http.setRequestProperty("authorization", authToken);
         http.setDoOutput(true);
-
-        // If data is provided, convert it to JSON and write it to the output stream
-        if (data != null) {
-            String jsonInputString = new Gson().toJson(data);
-            try (OutputStream os = http.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-        }
 
         StringBuilder response = new StringBuilder();
         try (InputStream respBody = http.getInputStream();
@@ -85,10 +77,9 @@ public class ServerFacade {
 
 
 
-    public String logoutCall() throws Exception {
-        return "";
+    public String logoutCall(String authToken) throws Exception {
+        return makeDeleteRequest(loginURI.toURL(), authToken);
     }
-
 
     public String registerCall(UserData registerData) throws Exception {
         return makePostRequest(registerURI.toURL(), registerData);
@@ -96,6 +87,22 @@ public class ServerFacade {
 
     public String loginCall(UserData loginData) throws Exception {
         return makePostRequest(loginURI.toURL(), loginData);
+    }
+
+    public String joinGameCall() throws Exception {
+        return null;
+    }
+
+    public String listGamesCall() throws Exception {
+        return null;
+    }
+
+    public String createGameCall() throws Exception {
+        return null;
+    }
+
+    public String observeGameCall() throws Exception {
+        return null;
     }
 
 
