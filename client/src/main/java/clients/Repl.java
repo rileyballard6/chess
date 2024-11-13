@@ -52,6 +52,8 @@ public class Repl {
                 System.out.println(createResponse);
                 break;
             case "list":
+                Object listResponse = postLoginClient.listGamesClient();
+                System.out.println(listResponse);
                 break;
             case "join":
                 break;

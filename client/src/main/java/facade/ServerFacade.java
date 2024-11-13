@@ -45,10 +45,11 @@ public class ServerFacade {
         return response.toString();
     }
 
-    public String makeGetRequest(URL url) throws Exception {
+    public String makeGetRequest(URL url, String authToken) throws Exception {
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("GET");
         http.setRequestProperty("Content-Type", "application/json; utf-8");
+        http.setRequestProperty("authorization", authToken);
 
         StringBuilder response = new StringBuilder();
         try (InputStream respBody = http.getInputStream();
@@ -97,8 +98,8 @@ public class ServerFacade {
         return null;
     }
 
-    public String listGamesCall() throws Exception {
-        return null;
+    public String listGamesCall(String authToken) throws Exception {
+        return makeGetRequest(gameURI.toURL(), authToken);
     }
 
     public String createGameCall(GameData gameData, String authToken) throws Exception {
