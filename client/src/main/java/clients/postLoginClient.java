@@ -2,6 +2,12 @@ package clients;
 
 public class postLoginClient {
 
+    private String authToken = null;
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
     public String logoutClient() {
         return "";
     }

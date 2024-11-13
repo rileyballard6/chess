@@ -18,15 +18,13 @@ public class ServerFacade {
     public ServerFacade() throws URISyntaxException {
     }
 
-    public String registerCall(UserData registerData) throws Exception {
-        HttpURLConnection http = (HttpURLConnection) registerURI.toURL().openConnection();
-
+    public String makePostRequest(URL url, Object data) throws Exception {
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/json; utf-8");
         http.setDoOutput(true);
 
-        String jsonInputString = new Gson().toJson(registerData);
-
+        String jsonInputString = new Gson().toJson(data);
         try (OutputStream os = http.getOutputStream()) {
             byte[] input = jsonInputString.getBytes("utf-8");
             os.write(input, 0, input.length);
@@ -43,9 +41,15 @@ public class ServerFacade {
         return response.toString();
     }
 
-    public String loginCall() {
-        return "";
+
+    public String registerCall(UserData registerData) throws Exception {
+        return makePostRequest(registerURI.toURL(), registerData);
     }
+
+    public String loginCall(UserData loginData) throws Exception {
+        return makePostRequest(loginURI.toURL(), loginData);
+    }
+
 
 
 

@@ -21,7 +21,11 @@ public class Repl {
     public void run() throws Exception {
         while (running) {
             String command = readInput();
-            evaluateInput(command);
+            if (!loggedIn) {
+                evaluateInput(command);
+            } else {
+                evaluateInputAuthenticated(command);
+            }
         }
     }
 
@@ -34,13 +38,40 @@ public class Repl {
         return scanner.nextLine().trim().toLowerCase();
     }
 
+    private void evaluateInputAuthenticated(String input) throws Exception {
+        return;
+    }
+
     private void evaluateInput(String input) throws Exception {
         String[] inputArray = input.split(" ");
         switch (inputArray[0]) {
             case "register":
-                String response = preLoginClient.registerClient(inputArray);
-                System.out.println(response);
-                loggedIn = true;
+                Object registerResponse = preLoginClient.registerClient(inputArray);
+                if (registerResponse == null) {
+                    System.out.println("Unable to login user at this time.");
+                } else if (registerResponse instanceof AuthData) {
+                    AuthData authData = (AuthData) registerResponse;
+                    System.out.println(authData.username() + " logged in.");
+                    userAuth = authData;
+                    loggedIn = true;
+                } else if (registerResponse instanceof String) {
+                    System.out.println((String) registerResponse);
+                }
+                break;
+
+            case "login":
+                Object loginResponse = preLoginClient.loginClient(inputArray);
+
+                if (loginResponse == null) {
+                    System.out.println("Unable to login user at this time.");
+                } else if (loginResponse instanceof AuthData) {
+                    AuthData authData = (AuthData) loginResponse;
+                    System.out.println(authData.username() + " logged in.");
+                    userAuth = authData;
+                    loggedIn = true;
+                } else if (loginResponse instanceof String) {
+                    System.out.println((String) loginResponse);
+                }
                 break;
             case "help":
                 printHelp();
