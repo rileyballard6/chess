@@ -37,7 +37,31 @@ public class Repl {
     }
 
     private void evaluateInputAuthenticated(String input) throws Exception {
-        return;
+        String[] inputArray = input.split(" ");
+        switch (inputArray[0]) {
+            case "logout":
+                Object logoutResponse = postLoginClient.logoutClient();
+                break;
+            case "create":
+                break;
+            case "list":
+                break;
+            case "join":
+                break;
+            case "observe":
+                break;
+            case "help":
+                printHelp();
+                break;
+            case "quit":
+                quit();
+                break;
+            case "":
+                break;
+            default:
+                System.out.println("Unknown command. Type 'help' for available commands.");
+                break;
+        }
     }
 
     private void evaluateInput(String input) throws Exception {
