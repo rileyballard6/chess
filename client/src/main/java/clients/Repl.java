@@ -48,6 +48,8 @@ public class Repl {
                 }
                 break;
             case "create":
+                Object createResponse = postLoginClient.createGameClient(inputArray);
+                System.out.println(createResponse);
                 break;
             case "list":
                 break;

@@ -2,6 +2,7 @@ package facade;
 
 
 import com.google.gson.Gson;
+import model.GameData;
 import model.UserData;
 
 import java.io.*;
@@ -18,10 +19,13 @@ public class ServerFacade {
     public ServerFacade() throws URISyntaxException {
     }
 
-    public String makePostRequest(URL url, Object data) throws Exception {
+    public String makePostRequest(URL url, Object data, String authToken, boolean needsAuth) throws Exception {
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/json; utf-8");
+        if (needsAuth) {
+            http.setRequestProperty("authorization", authToken);
+        }
         http.setDoOutput(true);
 
         String jsonInputString = new Gson().toJson(data);
@@ -82,11 +86,11 @@ public class ServerFacade {
     }
 
     public String registerCall(UserData registerData) throws Exception {
-        return makePostRequest(registerURI.toURL(), registerData);
+        return makePostRequest(registerURI.toURL(), registerData, null, false);
     }
 
     public String loginCall(UserData loginData) throws Exception {
-        return makePostRequest(loginURI.toURL(), loginData);
+        return makePostRequest(loginURI.toURL(), loginData, null, false);
     }
 
     public String joinGameCall() throws Exception {
@@ -97,8 +101,8 @@ public class ServerFacade {
         return null;
     }
 
-    public String createGameCall() throws Exception {
-        return null;
+    public String createGameCall(GameData gameData, String authToken) throws Exception {
+        return makePostRequest(gameURI.toURL(), gameData, authToken, true);
     }
 
     public String observeGameCall() throws Exception {

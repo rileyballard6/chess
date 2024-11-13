@@ -1,8 +1,9 @@
 package clients;
 
-import com.google.gson.Gson;
 import facade.ServerFacade;
+import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -37,8 +38,30 @@ public class postLoginClient {
         return "Unknown error.";
     }
 
-    public String createGameClient(String gameName) {
-        return "";
+    public String createGameClient(String[] gameDetails) throws Exception {
+        if (gameDetails.length != 2) {
+            return "Incorrect number of args.";
+        }
+
+        GameData newGame = new GameData(0, null, null, gameDetails[1], null);
+
+        try {
+            String createdGame = serverFacade.createGameCall(newGame, authToken);
+            Gson gson = new Gson();
+
+            Map<String, Object> responseMap = gson.fromJson(createdGame, Map.class);
+
+            if (responseMap.containsKey("gameID")) {
+                return "Game created with gameID: " + responseMap.get("gameID").toString();
+            } else if (responseMap.containsKey("message")) {
+                return responseMap.get("message").toString();
+            }
+
+            return createdGame;
+        } catch (Exception e) {
+            return "Unable to create game.";
+        }
+
     }
 
     public String listGamesClient() {
