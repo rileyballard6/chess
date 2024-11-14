@@ -118,7 +118,12 @@ public class postLoginClient {
         return "";
     }
 
-    public String observeGameClient(String gameId) {
+    public String observeGameClient(String[] joinDetails) {
+        if (joinDetails.length != 2) {
+            return "Incorrect number of args.";
+        }
+
+        chessBoardPrinter.printBothViews(new ChessBoard());
         return "";
     }
 }

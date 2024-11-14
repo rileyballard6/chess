@@ -92,7 +92,7 @@ public class ServerFacade {
     }
 
     public String observeGameCall() throws Exception {
-        return null;
+        return "observing";
     }
 
 

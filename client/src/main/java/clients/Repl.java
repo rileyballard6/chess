@@ -58,8 +58,12 @@ public class Repl {
             case "join":
                 Object joinResponse = postLoginClient.joinGameClient(inputArray);
                 System.out.print(joinResponse);
+                System.out.println("Successfully joined game! Make your move.");
                 break;
             case "observe":
+                Object observeResponse = postLoginClient.observeGameClient(inputArray);
+                System.out.print(observeResponse);
+                System.out.println("Successfully observing game! Enjoy.");
                 break;
             case "help":
                 printHelp();
