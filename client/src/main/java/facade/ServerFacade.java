@@ -3,6 +3,7 @@ package facade;
 
 import com.google.gson.Gson;
 import model.GameData;
+import model.JoinGameData;
 import model.UserData;
 
 import java.io.*;
@@ -19,9 +20,9 @@ public class ServerFacade {
     public ServerFacade() throws URISyntaxException {
     }
 
-    public String makePostRequest(URL url, Object data, String authToken, boolean needsAuth) throws Exception {
+    public String makePostRequest(URL url, Object data, String authToken, boolean needsAuth, String type) throws Exception {
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("POST");
+        http.setRequestMethod(type);
         http.setRequestProperty("Content-Type", "application/json; utf-8");
         if (needsAuth) {
             http.setRequestProperty("authorization", authToken);
@@ -45,26 +46,10 @@ public class ServerFacade {
         return response.toString();
     }
 
-    public String makeGetRequest(URL url, String authToken) throws Exception {
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("GET");
-        http.setRequestProperty("Content-Type", "application/json; utf-8");
-        http.setRequestProperty("authorization", authToken);
 
-        StringBuilder response = new StringBuilder();
-        try (InputStream respBody = http.getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(respBody, "utf-8"))) {
-            String responseLine;
-            while ((responseLine = reader.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-        }
-        return response.toString();
-    }
-
-    public String makeDeleteRequest(URL url, String authToken) throws Exception {
+    public String makeRequest(URL url, String authToken, String type) throws Exception {
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("DELETE");
+        http.setRequestMethod(type);
         http.setRequestProperty("Content-Type", "application/json; utf-8");
         http.setRequestProperty("authorization", authToken);
         http.setDoOutput(true);
@@ -83,27 +68,27 @@ public class ServerFacade {
 
 
     public String logoutCall(String authToken) throws Exception {
-        return makeDeleteRequest(loginURI.toURL(), authToken);
+        return makeRequest(loginURI.toURL(), authToken, "DELETE");
     }
 
     public String registerCall(UserData registerData) throws Exception {
-        return makePostRequest(registerURI.toURL(), registerData, null, false);
+        return makePostRequest(registerURI.toURL(), registerData, null, false, "POST");
     }
 
     public String loginCall(UserData loginData) throws Exception {
-        return makePostRequest(loginURI.toURL(), loginData, null, false);
+        return makePostRequest(loginURI.toURL(), loginData, null, false, "POST");
     }
 
-    public String joinGameCall() throws Exception {
-        return null;
+    public String joinGameCall(JoinGameData gameData, String authToken) throws Exception {
+        return makePostRequest(gameURI.toURL(), gameData, authToken, true, "PUT");
     }
 
     public String listGamesCall(String authToken) throws Exception {
-        return makeGetRequest(gameURI.toURL(), authToken);
+        return makeRequest(gameURI.toURL(), authToken, "GET");
     }
 
     public String createGameCall(GameData gameData, String authToken) throws Exception {
-        return makePostRequest(gameURI.toURL(), gameData, authToken, true);
+        return makePostRequest(gameURI.toURL(), gameData, authToken, true, "POST");
     }
 
     public String observeGameCall() throws Exception {

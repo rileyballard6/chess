@@ -106,8 +106,10 @@ public class Handler {
     }
 
     public static Object gameHandler(Request req, Response res) throws DataAccessException {
-        System.out.println(req.body());
         String authToken = getAuthToken(req);
+
+        System.out.print("REQUEST RECEIEVED!!!");
+
 
         if (req.requestMethod().equals("GET")) {
             return gameHandlerGET(res, authToken);
@@ -118,6 +120,7 @@ public class Handler {
             return gameHandlerPOST(res, authToken, body);
         } else if (req.requestMethod().equals("PUT")) {
             var body = getBody(req, model.JoinGameData.class);
+            System.out.println("JOINING GAME: " + body);
             return gameHandlerPUT(res, authToken, body);
         }
 

@@ -1,9 +1,12 @@
 package clients;
 
+import chess.ChessBoard;
 import facade.ServerFacade;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import model.JoinGameData;
+import ui.TerminalChessBoard;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -16,6 +19,7 @@ public class postLoginClient {
     ServerFacade serverFacade = new ServerFacade();
     private String authToken = null;
     Map<String, String> currentGames = new HashMap<>();
+    TerminalChessBoard chessBoardPrinter = new TerminalChessBoard();
 
     public postLoginClient() throws URISyntaxException {
     }
@@ -87,7 +91,6 @@ public class postLoginClient {
                 System.out.printf("       White player: %s%n", whitePlayer);
                 System.out.printf("       Black player: %s%n", blackPlayer);
             }
-            System.out.println(currentGames);
             return "";
 
         } catch (Exception e) {
@@ -95,7 +98,23 @@ public class postLoginClient {
         }
     }
 
-    public String joinGameClient(String gameId, String playerColor) {
+    public String joinGameClient(String[] joinDetails) throws Exception {
+        if (joinDetails.length != 3) {
+            return "Incorrect number of args.";
+        }
+
+        String gameID = currentGames.get(joinDetails[1]);
+        String teamColor = joinDetails[2];
+        try {
+            JoinGameData joinGameRequest = new JoinGameData(teamColor, (int) Float.parseFloat(gameID));
+            String joinedGame = serverFacade.joinGameCall(joinGameRequest, authToken);
+            if (Objects.equals(joinedGame, "{}")) {
+                chessBoardPrinter.printBothViews(new ChessBoard());
+            }
+
+        } catch (Exception e) {
+            return "Unable to join game. Please check your syntax.";
+        }
         return "";
     }
 

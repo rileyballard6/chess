@@ -33,7 +33,7 @@ public class Repl {
         } else {
             System.out.print("\n[LOGGED_OUT] >>> ");
         }
-        return scanner.nextLine().trim().toLowerCase();
+        return scanner.nextLine().trim();
     }
 
     private void evaluateInputAuthenticated(String input) throws Exception {
@@ -56,6 +56,8 @@ public class Repl {
                 System.out.println(listResponse);
                 break;
             case "join":
+                Object joinResponse = postLoginClient.joinGameClient(inputArray);
+                System.out.print(joinResponse);
                 break;
             case "observe":
                 break;
