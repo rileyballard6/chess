@@ -14,28 +14,32 @@ public class TerminalChessBoard {
     private static final String BROWN_BG = "\u001B[48;5;95m";
 
 
-    public static void printBoard(ChessBoard board, boolean whiteView) {
-        printRowLetters(whiteView);
+    public static void printBoard(ChessBoard board, boolean whitePerspective) {
+        printRowLetters(whitePerspective);
+        int col = whitePerspective ? 8 : 1;
+        int row = whitePerspective ? 1 : 8;
+        int colAddition = whitePerspective ? -1 : 1;
+        int rowAddition = whitePerspective ? 1 : -1;
 
-        for (int col = whiteView ? 8 : 1; whiteView ? col >= 1 : col <= 8; col = whiteView ? col - 1 : col + 1) {
+        for (int i = col; whitePerspective ? i >= 1 : i <= 8; i += colAddition) {
             System.out.print(col + " ");
 
-            for (int row = whiteView ? 1 : 8; whiteView ? row <= 8 : row >= 1; row = whiteView ? row + 1 : row - 1) {
-                ChessPosition pos = new ChessPosition(col, row);
+            for (int j = row; whitePerspective ? j <= 8 : j >= 1; j += rowAddition) {
+                ChessPosition pos = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(pos);
-                boolean isWhiteSquare = (col + row) % 2 == 1;
-                printSquare(piece, isWhiteSquare);
+                boolean isWhiteSquare = (i + j) % 2 == 1;
+                printTile(piece, isWhiteSquare);
             }
 
             System.out.println(" " + col);
         }
 
-        printRowLetters(whiteView);
+        printRowLetters(whitePerspective);
     }
 
-    private static void printRowLetters(boolean whiteView) {
+    private static void printRowLetters(boolean whitePerspective) {
         System.out.print("  ");
-        if (whiteView) {
+        if (whitePerspective) {
             for (int i = 0; i < 8; i++) {
                 System.out.print(" " + (char)('a' + i) + " ");
             }
@@ -47,7 +51,7 @@ public class TerminalChessBoard {
         System.out.println();
     }
 
-    private static void printSquare(ChessPiece piece, boolean isWhiteSquare) {
+    private static void printTile(ChessPiece piece, boolean isWhiteSquare) {
         String background = isWhiteSquare ? LIGHT_GREY_BG : BROWN_BG;
 
         if (piece != null) {
