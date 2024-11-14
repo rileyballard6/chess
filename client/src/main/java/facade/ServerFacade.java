@@ -91,12 +91,5 @@ public class ServerFacade {
         return makePostRequest(gameURI.toURL(), gameData, authToken, true, "POST");
     }
 
-    public String observeGameCall() throws Exception {
-        return "observing";
-    }
-
-
-
-
 
 }

@@ -32,12 +32,16 @@ public class ServerFacadeTests {
         }
     }
 
-    //Set up should clear the database each time.
     @BeforeAll
-    public static void init() throws IOException {
+    public static void initAll() throws IOException {
         server = new Server();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
+    }
+
+    //Set up should clear the database each time.
+    @BeforeEach
+    public void init() throws IOException {
 
         URL url = new URL("http://localhost:8080/db");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -211,21 +215,55 @@ public class ServerFacadeTests {
     }
 
 
-
-
     @Test
-    public void observeGameTest() {
-        assertTrue(true);
+    public void makeRequestTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        serverFacade.createGameCall(newGame, authToken.authToken());
+        serverFacade.listGamesCall(authToken.authToken());
+
+        URL url = new URL("http://localhost:8080/game");
+        String games = serverFacade.makeRequest(url, authToken.authToken(), "GET");
+
+        assertTrue(games.length() > 10);
     }
 
     @Test
-    public void makeRequestTest() {
-        assertTrue(true);
+    public void makeRequestTestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        serverFacade.createGameCall(newGame, authToken.authToken());
+        serverFacade.listGamesCall(authToken.authToken());
+
+        URL url = new URL("http://localhost:8080/game");
+        assertThrows(IOException.class, () -> serverFacade.makeRequest(url, "asd", "GET"));
     }
 
     @Test
-    public void makePostRequestTest() {
-        assertTrue(true);
+    public void makePostRequestTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        URL url = new URL("http://localhost:8080/user");
+        String answer = serverFacade.makePostRequest(url, registerTest, null, false, "POST");
+
+        assertTrue(answer.length() > 10);
+    }
+
+    @Test
+    public void makePostRequestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        URL url = new URL("http://localhost:8080/wrongurl");
+        assertThrows(IOException.class, () -> serverFacade.makePostRequest(url, registerTest, null, false, "POST"));
+
     }
 
 }
