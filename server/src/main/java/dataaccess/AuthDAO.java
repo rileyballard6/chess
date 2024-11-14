@@ -2,14 +2,9 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -109,51 +104,6 @@ public class AuthDAO {
             return false;
         }
     }
-
-    /**
-     * BELOW ARE NON SQL FUNCTIONS FOR DATA ACCESS
-     * */
-
-    /**
-    *public AuthData createAuth(String username) {
-    *    String newAuthToken = generateToken();
-    *    AuthData newAuthData = new AuthData(newAuthToken, username);
-    *    authTokens.add(newAuthData);
-    *    return newAuthData;
-    *}
-    *
-    *public boolean findAuth(String authToken) {
-    *    for (AuthData currentAuth : authTokens) {
-    *        if (currentAuth.authToken().equals(authToken)) {
-    *            return true;
-    *        }
-    *    }
-    *    return false;
-    *}
-    *public boolean deleteAuthData(String authToken) {
-    * for (int i = 0; i < authTokens.size(); i++) {
-    *        AuthData currentAuth = authTokens.get(i);
-    *        if (currentAuth.authToken().equals(authToken)) {
-    *            authTokens.remove(i);
-    *            return true;
-    *        }
-    *    }
-    *    return false;
-    *}
-    *
-    *
-    *public AuthData getAuthData(String authToken) {
-    *    for (AuthData currentAuth : authTokens) {
-    *        if (currentAuth.authToken().equals(authToken)) {
-    *            return currentAuth;
-    *        }
-    *    }
-    *    return null;
-    *}
-    *public boolean isEmpty() {
-    *    return authTokens.isEmpty();
-    *}
-     */
 
 
     public static String generateToken() {

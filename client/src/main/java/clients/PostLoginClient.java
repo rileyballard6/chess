@@ -3,7 +3,6 @@ package clients;
 import chess.ChessBoard;
 import facade.ServerFacade;
 import com.google.gson.Gson;
-import model.AuthData;
 import model.GameData;
 import model.JoinGameData;
 import ui.TerminalChessBoard;
@@ -14,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class postLoginClient {
+public class PostLoginClient {
 
-    ServerFacade serverFacade = new ServerFacade();
+    ServerFacade serverFacade = new ServerFacade(8080);
     private String authToken = null;
     Map<String, String> currentGames = new HashMap<>();
     TerminalChessBoard chessBoardPrinter = new TerminalChessBoard();
 
-    public postLoginClient() throws URISyntaxException {
+    public PostLoginClient() throws URISyntaxException {
     }
 
     public void setAuthToken(String authToken) {

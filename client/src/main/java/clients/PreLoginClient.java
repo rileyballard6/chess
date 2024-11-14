@@ -7,11 +7,11 @@ import com.google.gson.Gson;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-public class preLoginClient {
+public class PreLoginClient {
 
-    ServerFacade serverFacade = new ServerFacade();
+    ServerFacade serverFacade = new ServerFacade(8080);
 
-    public preLoginClient() throws URISyntaxException {
+    public PreLoginClient() throws URISyntaxException {
     }
 
     public Object registerClient(String[] stringArray) throws Exception {

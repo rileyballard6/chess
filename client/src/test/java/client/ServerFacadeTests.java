@@ -21,27 +21,29 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
+    private static int port;
 
-    static {
+
+    @BeforeAll
+    public static void initAll() throws IOException {
+        server = new Server();
+        port = server.run(0);
+        System.out.println("Started test HTTP server on " + port);
+
         try {
-            serverFacade = new ServerFacade();
+            serverFacade = new ServerFacade(port); // Pass the port here directly
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @BeforeAll
-    public static void initAll() throws IOException {
-        server = new Server();
-        var port = server.run(8080);
-        System.out.println("Started test HTTP server on " + port);
-    }
+
 
     //Set up should clear the database each time.
     @BeforeEach
     public void init() throws IOException {
 
-        URL url = new URL("http://localhost:8080/db");
+        URL url = new URL("http://localhost:" + port + "/db");
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("DELETE");
         http.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -225,7 +227,7 @@ public class ServerFacadeTests {
         serverFacade.createGameCall(newGame, authToken.authToken());
         serverFacade.listGamesCall(authToken.authToken());
 
-        URL url = new URL("http://localhost:8080/game");
+        URL url = new URL("http://localhost:" + port + "/game");
         String games = serverFacade.makeRequest(url, authToken.authToken(), "GET");
 
         assertTrue(games.length() > 10);
@@ -243,14 +245,14 @@ public class ServerFacadeTests {
         serverFacade.createGameCall(newGame, authToken.authToken());
         serverFacade.listGamesCall(authToken.authToken());
 
-        URL url = new URL("http://localhost:8080/game");
+        URL url = new URL("http://localhost:" + port + "/game");
         assertThrows(IOException.class, () -> serverFacade.makeRequest(url, "asd", "GET"));
     }
 
     @Test
     public void makePostRequestTestTrue() throws Exception {
         UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
-        URL url = new URL("http://localhost:8080/user");
+        URL url = new URL("http://localhost:" + port + "/user");
         String answer = serverFacade.makePostRequest(url, registerTest, null, false, "POST");
 
         assertTrue(answer.length() > 10);
@@ -259,7 +261,7 @@ public class ServerFacadeTests {
     @Test
     public void makePostRequestFalse() throws Exception {
         UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
-        URL url = new URL("http://localhost:8080/wrongurl");
+        URL url = new URL("http://localhost:" + port + "/wrongurl");
         assertThrows(IOException.class, () -> serverFacade.makePostRequest(url, registerTest, null, false, "POST"));
 
     }

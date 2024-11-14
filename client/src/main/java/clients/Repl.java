@@ -10,8 +10,8 @@ public class Repl {
     private boolean loggedIn = false;
     private boolean running = true;
 
-    final private preLoginClient preLoginClient = new preLoginClient();
-    final private postLoginClient postLoginClient = new postLoginClient();
+    final private PreLoginClient preLoginClient = new PreLoginClient();
+    final private PostLoginClient postLoginClient = new PostLoginClient();
 
     public Repl() throws URISyntaxException {
     }

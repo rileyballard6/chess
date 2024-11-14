@@ -12,12 +12,18 @@ import java.util.Map;
 
 public class ServerFacade {
 
-    URI registerURI = new URI("http://localhost:8080/user");
-    URI loginURI = new URI("http://localhost:8080/session");
-    URI gameURI = new URI("http://localhost:8080/game");
-    URI clearURI = new URI("http://localhost:8080/db");
+    public int port;
+    URI registerURI;
+    URI loginURI;
+    URI gameURI;
+    URI clearURI;
 
-    public ServerFacade() throws URISyntaxException {
+    public ServerFacade(int port) throws URISyntaxException {
+        this.port = port;
+        this.registerURI = new URI("http://localhost:" + port + "/user");
+        this.loginURI = new URI("http://localhost:" + port + "/session");
+        this.gameURI = new URI("http://localhost:" + port + "/game");
+        this.clearURI = new URI("http://localhost:" + port + "/db");
     }
 
     public String makePostRequest(URL url, Object data, String authToken, boolean needsAuth, String type) throws Exception {
