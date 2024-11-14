@@ -59,19 +59,14 @@ public class Repl {
                 Object joinResponse = postLoginClient.joinGameClient(inputArray);
                 System.out.print(joinResponse);
                 System.out.println("\n");
-                System.out.println("Successfully joined game! Make your move.");
                 break;
             case "observe":
                 Object observeResponse = postLoginClient.observeGameClient(inputArray);
                 System.out.print(observeResponse);
                 System.out.println("\n");
-                System.out.println("Successfully observing game! Enjoy.");
                 break;
             case "help":
                 printHelp();
-                break;
-            case "quit":
-                quit();
                 break;
             case "":
                 break;
@@ -114,7 +109,6 @@ public class Repl {
             System.out.println("- join <ID> [WHITE|BLACK]  : join a game");
             System.out.println("- observe <ID>             : watch a game");
             System.out.println("- logout                   : log out");
-            System.out.println("- quit                     : quit playing chess");
             System.out.println("- help                     : view possible commands");
         } else {
             System.out.println("\nAvailable options:");

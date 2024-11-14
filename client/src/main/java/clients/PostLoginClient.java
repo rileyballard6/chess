@@ -122,7 +122,15 @@ public class PostLoginClient {
             return "Incorrect number of args.";
         }
 
+        if (currentGames.isEmpty()) {
+            return "There are no games to obverse";
+        }
+
+        if (Integer.parseInt(joinDetails[1]) > currentGames.size() || Integer.parseInt(joinDetails[1]) == 0) {
+            return "Game not found";
+        }
+
         chessBoardPrinter.printBothViews(new ChessBoard());
-        return "";
+        return "Successfully observing game " + joinDetails[1];
     }
 }
