@@ -138,16 +138,45 @@ public class ServerFacadeTests {
 
     }
 
+    @Test
+    public void listGameTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        serverFacade.createGameCall(newGame, authToken.authToken());
+
+        String gameList = serverFacade.listGamesCall(authToken.authToken());
+
+        assertTrue(gameList.length() > 10);
+
+    }
+
+    @Test
+    public void listGameTestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        serverFacade.createGameCall(newGame, authToken.authToken());
+
+        assertThrows(IOException.class, () -> serverFacade.listGamesCall("ASDASD"));
+
+    }
+
 
 
     @Test
     public void joinGameTest() {
         assertTrue(true);
     }
-    @Test
-    public void listGameTest() {
-        assertTrue(true);
-    }
+
 
 
 
