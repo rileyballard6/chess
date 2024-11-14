@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import facade.ServerFacade;
 import model.AuthData;
 import model.GameData;
+import model.JoinGameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -13,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -170,11 +172,42 @@ public class ServerFacadeTests {
 
     }
 
+    @Test
+    public void joinGameTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
 
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        String gameID = serverFacade.createGameCall(newGame, authToken.authToken());
+        GameData gameData = gson.fromJson(gameID, GameData.class);
+
+        JoinGameData joinGame = new JoinGameData("BLACK", gameData.gameID());
+
+        String gameJoined = serverFacade.joinGameCall(joinGame, authToken.authToken());
+
+        assertEquals("{}", gameJoined);
+
+    }
 
     @Test
-    public void joinGameTest() {
-        assertTrue(true);
+    public void joinGameTestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        String gameID = serverFacade.createGameCall(newGame, authToken.authToken());
+        GameData gameData = gson.fromJson(gameID, GameData.class);
+
+        JoinGameData joinGame = new JoinGameData("test", gameData.gameID());
+
+        assertThrows(IOException.class, () -> serverFacade.joinGameCall(joinGame, authToken.authToken()));
+
     }
 
 
