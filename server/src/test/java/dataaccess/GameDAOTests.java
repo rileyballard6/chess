@@ -123,7 +123,7 @@ public class GameDAOTests {
 
     @Test
     public void gameDAOAddPlayerPositive() throws DataAccessException {
-        GameData newGame = new GameData(123, null, null, "name", null);
+        GameData newGame = new GameData(125, null, null, "gameNAME", null);
         AuthData testAuth = new AuthData("abc", "testUser");
 
         int gameId = testGame.createGameSQL(newGame);
