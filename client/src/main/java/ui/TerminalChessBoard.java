@@ -9,20 +9,19 @@ public class TerminalChessBoard {
 
     private static final String RESET = "\u001B[0m";
     private static final String BLACK = "\u001B[30m";
-    private static final String WHITE = "\u001B[37m";
     private static final String LIGHT_GREY_BG = "\u001B[47m";
     private static final String BROWN_BG = "\u001B[48;5;95m";
 
 
     public static void printBoard(ChessBoard board, boolean whitePerspective) {
-        printRowLetters(whitePerspective);
+        printLetters(whitePerspective);
         int col = whitePerspective ? 8 : 1;
         int row = whitePerspective ? 1 : 8;
         int colAddition = whitePerspective ? -1 : 1;
         int rowAddition = whitePerspective ? 1 : -1;
 
         for (int i = col; whitePerspective ? i >= 1 : i <= 8; i += colAddition) {
-            System.out.print(col + " ");
+            System.out.print(i + " ");
 
             for (int j = row; whitePerspective ? j <= 8 : j >= 1; j += rowAddition) {
                 ChessPosition pos = new ChessPosition(i, j);
@@ -31,24 +30,10 @@ public class TerminalChessBoard {
                 printTile(piece, isWhiteSquare);
             }
 
-            System.out.println(" " + col);
+            System.out.println(" " + i);
         }
 
-        printRowLetters(whitePerspective);
-    }
-
-    private static void printRowLetters(boolean whitePerspective) {
-        System.out.print("  ");
-        if (whitePerspective) {
-            for (int i = 0; i < 8; i++) {
-                System.out.print(" " + (char)('a' + i) + " ");
-            }
-        } else {
-            for (int i = 7; i >= 0; i--) {
-                System.out.print(" " + (char)('a' + i) + " ");
-            }
-        }
-        System.out.println();
+        printLetters(whitePerspective);
     }
 
     private static void printTile(ChessPiece piece, boolean isWhiteSquare) {
@@ -62,6 +47,22 @@ public class TerminalChessBoard {
             System.out.print(background + "   " + RESET);
         }
     }
+
+    private static void printLetters(boolean whitePerspective) {
+        System.out.print("  ");
+        if (whitePerspective) {
+            for (int i = 0; i < 8; i++) {
+                System.out.print(" " + (char)('a' + i) + " ");
+            }
+        } else {
+            for (int i = 7; i >= 0; i--) {
+                System.out.print(" " + (char)('a' + i) + " ");
+            }
+        }
+        System.out.println();
+    }
+
+
 
     public static void printBothViews(ChessBoard board) {
         board.resetBoard();
