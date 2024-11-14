@@ -3,6 +3,7 @@ package client;
 import com.google.gson.Gson;
 import facade.ServerFacade;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -110,6 +111,33 @@ public class ServerFacadeTests {
 
     }
 
+    @Test
+    public void createGameTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, "gameTest", null);
+
+        String gameCreated = serverFacade.createGameCall(newGame, authToken.authToken());
+
+        assertTrue(gameCreated.length() > 0);
+    }
+
+    @Test
+    public void createGameTestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+        GameData newGame = new GameData(0, null,null, null, null);
+
+        assertThrows(IOException.class, () ->serverFacade.createGameCall(newGame,"123"));
+
+    }
+
 
 
     @Test
@@ -121,10 +149,7 @@ public class ServerFacadeTests {
         assertTrue(true);
     }
 
-    @Test
-    public void createGameTest() {
-        assertTrue(true);
-    }
+
 
     @Test
     public void observeGameTest() {
