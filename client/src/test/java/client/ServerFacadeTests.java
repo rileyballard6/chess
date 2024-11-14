@@ -65,13 +65,23 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void loginTestTrue() {
-        assertTrue(true);
+    public void loginTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+
+        String answer = serverFacade.registerCall(registerTest);
+
+        String auth = serverFacade.loginCall(new UserData("testuser", "passwordtest", null));
+        assertTrue(auth.length() > 10);
+
     }
 
     @Test
-    public void loginTestFalse() {
-        assertTrue(true);
+    public void loginTestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+
+        String answer = serverFacade.registerCall(registerTest);
+
+        assertThrows(IOException.class, () -> serverFacade.loginCall(new UserData("testuser", "password", null)));
     }
 
 
