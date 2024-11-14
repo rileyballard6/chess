@@ -1,6 +1,8 @@
 package client;
 
+import com.google.gson.Gson;
 import facade.ServerFacade;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -85,12 +88,27 @@ public class ServerFacadeTests {
     }
 
 
-
     @Test
-    public void logoutTest() {
-        assertTrue(true);
+    public void logoutTestTrue() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        String answer = serverFacade.registerCall(registerTest);
+
+        Gson gson = new Gson();
+        AuthData authToken = gson.fromJson(answer, AuthData.class);
+
+        String logout = serverFacade.logoutCall(authToken.authToken());
+        assertEquals("{}", logout);
+
     }
 
+    @Test
+    public void logoutTestFalse() throws Exception {
+        UserData registerTest = new UserData("testuser", "passwordtest", "email@gmail.com");
+        serverFacade.registerCall(registerTest);
+
+        assertThrows(IOException.class, () -> serverFacade.logoutCall("123"));
+
+    }
 
 
 
