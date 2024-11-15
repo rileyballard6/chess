@@ -58,7 +58,7 @@ public class PostLoginClient {
             Map<String, Object> responseMap = gson.fromJson(createdGame, Map.class);
 
             if (responseMap.containsKey("gameID")) {
-                return "Game created with gameID: " + responseMap.get("gameID").toString();
+                return "Game successfully created";
             } else if (responseMap.containsKey("message")) {
                 return responseMap.get("message").toString();
             }
@@ -126,7 +126,7 @@ public class PostLoginClient {
             return "There are no games to obverse";
         }
 
-        if (Integer.parseInt(joinDetails[1]) > currentGames.size() || Integer.parseInt(joinDetails[1]) == 0) {
+        if (Integer.parseInt(joinDetails[1]) > currentGames.size() || Integer.parseInt(joinDetails[1]) < 1) {
             return "Game not found";
         }
 
