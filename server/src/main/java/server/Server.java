@@ -1,12 +1,13 @@
 package server;
 
 import java.sql.SQLException;
-import java.util.UUID;
 import chess.ChessGame;
 import chess.ChessPiece;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import spark.*;
+import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.*;
 
 
 public class Server {
@@ -19,8 +20,10 @@ public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
+
+        new WSServer().run(8080);
+
 
         try {
             DatabaseManager.createDatabase();
@@ -71,6 +74,8 @@ public class Server {
 
         //Delete all data
         Spark.delete("/db", Handler::deleteHandler);
+
+        Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
 
 
         Spark.awaitInitialization();
