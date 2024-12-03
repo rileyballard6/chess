@@ -10,6 +10,10 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+    String game;
+    String errorMessage;
+    String message;
+
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -17,8 +21,13 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type) {
+    public ServerMessage(ServerMessageType type, String data) {
         this.serverMessageType = type;
+        switch (type) {
+            case LOAD_GAME -> this.game = data;
+            case ERROR -> this.errorMessage = data;
+            case NOTIFICATION -> this.message = data;
+        }
     }
 
     public ServerMessageType getServerMessageType() {

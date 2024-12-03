@@ -30,12 +30,17 @@ public class WSServer {
         System.out.println(body.getCommandType());
 
         switch (body.getCommandType()) {
-            case CONNECT, LEAVE, RESIGN -> {
-                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+            case CONNECT -> {
+                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
+                session.getRemote().sendString(new Gson().toJson(newMessage));
+                session.getRemote().flush();
+            }
+            case MAKE_MOVE, RESIGN, LEAVE -> {
+                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This is a notification");
                 session.getRemote().sendString(new Gson().toJson(newMessage));
             }
-            case MAKE_MOVE -> {
-                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            default -> {
+                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Error occurred");
                 session.getRemote().sendString(new Gson().toJson(newMessage));
             }
         }
