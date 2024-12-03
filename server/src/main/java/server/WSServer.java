@@ -1,11 +1,10 @@
 package server;
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
+import com.google.gson.Gson;
+
 import org.eclipse.jetty.websocket.api.Session;
 import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
-
-import java.sql.SQLException;
+import websocket.messages.ServerMessage;
 
 @WebSocket
 public class WSServer {
@@ -19,7 +18,6 @@ public class WSServer {
         Spark.staticFiles.location("web");
 
         Spark.webSocket("/ws", WSServer.class);
-        System.out.println("WebSocket server initialized at /ws");
         Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
 
         Spark.awaitInitialization();
@@ -28,6 +26,26 @@ public class WSServer {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        session.getRemote().sendString("WebSocket response: " + message);
+        var body = getBody(message, websocket.commands.UserGameCommand.class);
+        System.out.println(body.getCommandType());
+
+        switch (body.getCommandType()) {
+            case CONNECT, LEAVE, RESIGN -> {
+                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+                session.getRemote().sendString(new Gson().toJson(newMessage));
+            }
+            case MAKE_MOVE -> {
+                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+                session.getRemote().sendString(new Gson().toJson(newMessage));
+            }
+        }
+    }
+
+    private static <T> T getBody(String message, Class<T> clazz) {
+        var body = new Gson().fromJson(message, clazz);
+        if (body == null) {
+            throw new RuntimeException("missing required body");
+        }
+        return body;
     }
 }
