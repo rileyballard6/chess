@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 @WebSocket
 public class WSServer {
-    private static final Set<Session> activeSessions = new CopyOnWriteArraySet<>();
+    private static final Set<Session> ACTIVE_SESSIONS = new CopyOnWriteArraySet<>();
     private AuthDAO authDAO = new AuthDAO();
     private GameDAO gameDAO = new GameDAO();
     private ChessGame sampleGame = null;
