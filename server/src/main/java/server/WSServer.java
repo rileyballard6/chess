@@ -47,14 +47,14 @@ public class WSServer {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        activeSessions.add(session);
+        ACTIVE_SESSIONS.add(session);
         System.out.println("New connection added");
         sampleGame = new ChessGame();
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        activeSessions.remove(session);
+        ACTIVE_SESSIONS.remove(session);
         System.out.println("Connection closed");
     }
 
@@ -82,20 +82,20 @@ public class WSServer {
 
                 sendMessage(session, ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
 
-                for (Session activeSession : activeSessions) {
+                for (Session activeSession : ACTIVE_SESSIONS) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
                         sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "New Player joined game");
                     }
                 }
             }
             case LEAVE -> {
-                for (Session activeSession : activeSessions) {
+                for (Session activeSession : ACTIVE_SESSIONS) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
                         sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Player left game");
                     }
                 }
 
-                activeSessions.remove(session);
+                ACTIVE_SESSIONS.remove(session);
                 leaveGame(authData.username(), body.getGameID());
             }
 
@@ -106,7 +106,7 @@ public class WSServer {
                     return;
                 }
 
-                for (Session activeSession : activeSessions) {
+                for (Session activeSession : ACTIVE_SESSIONS) {
                     sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned");
                 }
 
@@ -135,11 +135,11 @@ public class WSServer {
                     return;
                 }
 
-                for (Session activeSession : activeSessions) {
+                for (Session activeSession : ACTIVE_SESSIONS) {
                     sendMessage(activeSession, ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
                 }
 
-                for (Session activeSession : activeSessions) {
+                for (Session activeSession : ACTIVE_SESSIONS) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
                         sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Notification");
                     }
