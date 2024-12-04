@@ -121,6 +121,20 @@ public class GameDAO {
         }
     }
 
+    public boolean clearOneGame(int gameID) throws DataAccessException {
+        String sqlQuery = "DELETE FROM GameData WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setInt(1, gameID);
+                preparedStatement.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     public boolean clearGames() throws DataAccessException {
         String sqlQuery = "DELETE FROM GameData";
 

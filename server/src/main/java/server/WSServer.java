@@ -54,6 +54,7 @@ public class WSServer {
         var body = getBody(message, websocket.commands.UserGameCommand.class);
 
         boolean authExists = authDAO.findAuthSQL(body.getAuthToken());
+        boolean gameExists = gameDAO.gameExistsSQL(body.getGameID());
 
         if (!authExists) {
             ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Auth does not exist");
@@ -61,14 +62,15 @@ public class WSServer {
             return;
         }
 
+        if (!gameExists) {
+            ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
+            session.getRemote().sendString(new Gson().toJson(newMessage));
+            return;
+        }
+
         switch (body.getCommandType()) {
             case CONNECT -> {
-                boolean gameExists = gameDAO.gameExistsSQL(body.getGameID());
-                if (!gameExists) {
-                    ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
-                    session.getRemote().sendString(new Gson().toJson(newMessage));
-                    break;
-                }
+
                 ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
                 session.getRemote().sendString(new Gson().toJson(newMessage));
 
@@ -90,10 +92,13 @@ public class WSServer {
             }
 
             case RESIGN -> {
+
                 ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned!");
                 for (Session activeSession : activeSessions) {
                     activeSession.getRemote().sendString(new Gson().toJson(leaveMessage));
                 }
+
+                gameDAO.clearOneGame(body.getGameID());
             }
 
             case MAKE_MOVE -> {
