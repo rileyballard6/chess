@@ -72,9 +72,30 @@ public class WSServer {
                 }
                 activeSessions.remove(session);
             }
-            case MAKE_MOVE, RESIGN -> {
+
+            case RESIGN -> {
+                ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned!");
+                for (Session activeSession : activeSessions) {
+                    activeSession.getRemote().sendString(new Gson().toJson(leaveMessage));
+                }
+            }
+
+            case MAKE_MOVE -> {
+                ServerMessage loadMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Player has made a move");
+                for (Session activeSession : activeSessions) {
+                    activeSession.getRemote().sendString(new Gson().toJson(loadMessage));
+                }
+
                 ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This is a notification");
-                session.getRemote().sendString(new Gson().toJson(newMessage));
+
+                for (Session activeSession : activeSessions) {
+                    System.out.println(activeSession);
+                    if (!activeSession.equals(session) && activeSession.isOpen()) {
+                         activeSession.getRemote().sendString(new Gson().toJson(newMessage));
+                    }
+                }
+
+
             }
             default -> {
                 ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Error occurred");
