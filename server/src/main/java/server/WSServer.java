@@ -6,6 +6,8 @@ import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.messages.ServerMessage;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -33,6 +35,8 @@ public class WSServer {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
+        Map<String, List<String>> headers = session.getUpgradeRequest().getHeaders();
+
         activeSessions.add(session);
         System.out.println("New connection added");
     }
@@ -59,7 +63,16 @@ public class WSServer {
                     }
                 }
             }
-            case MAKE_MOVE, RESIGN, LEAVE -> {
+            case LEAVE -> {
+                ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Player has left the game");
+                for (Session activeSession : activeSessions) {
+                    if (!activeSession.equals(session) && activeSession.isOpen()) {
+                        activeSession.getRemote().sendString(new Gson().toJson(leaveMessage));
+                    }
+                }
+                activeSessions.remove(session);
+            }
+            case MAKE_MOVE, RESIGN -> {
                 ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This is a notification");
                 session.getRemote().sendString(new Gson().toJson(newMessage));
             }
@@ -69,6 +82,8 @@ public class WSServer {
             }
         }
     }
+
+    private boolean confirmAuth() { return false; }
 
     private static <T> T getBody(String message, Class<T> clazz) {
         var body = new Gson().fromJson(message, clazz);
