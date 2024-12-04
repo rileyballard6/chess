@@ -1,6 +1,8 @@
 package server;
 import com.google.gson.Gson;
 
+import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
 import org.eclipse.jetty.websocket.api.Session;
 import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -14,6 +16,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @WebSocket
 public class WSServer {
     private static final Set<Session> activeSessions = new CopyOnWriteArraySet<>();
+    private AuthDAO authDAO = new AuthDAO();
+    private GameDAO gameDAO = new GameDAO();
 
 
     public static void main(String[] args) {
@@ -35,8 +39,6 @@ public class WSServer {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        Map<String, List<String>> headers = session.getUpgradeRequest().getHeaders();
-
         activeSessions.add(session);
         System.out.println("New connection added");
     }
@@ -51,8 +53,22 @@ public class WSServer {
     public void onMessage(Session session, String message) throws Exception {
         var body = getBody(message, websocket.commands.UserGameCommand.class);
 
+        boolean authExists = authDAO.findAuthSQL(body.getAuthToken());
+
+        if (!authExists) {
+            ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Auth does not exist");
+            session.getRemote().sendString(new Gson().toJson(newMessage));
+            return;
+        }
+
         switch (body.getCommandType()) {
             case CONNECT -> {
+                boolean gameExists = gameDAO.gameExistsSQL(body.getGameID());
+                if (!gameExists) {
+                    ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
+                    session.getRemote().sendString(new Gson().toJson(newMessage));
+                    break;
+                }
                 ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
                 session.getRemote().sendString(new Gson().toJson(newMessage));
 
@@ -89,22 +105,20 @@ public class WSServer {
                 ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This is a notification");
 
                 for (Session activeSession : activeSessions) {
-                    System.out.println(activeSession);
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
-                         activeSession.getRemote().sendString(new Gson().toJson(newMessage));
+                        activeSession.getRemote().sendString(new Gson().toJson(newMessage));
                     }
                 }
 
 
             }
-            default -> {
-                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Error occurred");
-                session.getRemote().sendString(new Gson().toJson(newMessage));
-            }
         }
     }
 
-    private boolean confirmAuth() { return false; }
+
+    private boolean confirmGameID() {
+        return false;
+    }
 
     private static <T> T getBody(String message, Class<T> clazz) {
         var body = new Gson().fromJson(message, clazz);
