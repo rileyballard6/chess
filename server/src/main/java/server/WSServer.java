@@ -1,4 +1,6 @@
 package server;
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 
 import dataaccess.AuthDAO;
@@ -22,6 +24,7 @@ public class WSServer {
     private static final Set<Session> activeSessions = new CopyOnWriteArraySet<>();
     private AuthDAO authDAO = new AuthDAO();
     private GameDAO gameDAO = new GameDAO();
+    private ChessGame sampleGame = null;
 
 
     public static void main(String[] args) {
@@ -45,6 +48,9 @@ public class WSServer {
     public void onConnect(Session session) {
         activeSessions.add(session);
         System.out.println("New connection added");
+        if (sampleGame == null) {
+            sampleGame = new ChessGame();
+        }
     }
 
     @OnWebSocketClose
@@ -110,8 +116,17 @@ public class WSServer {
 
             case MAKE_MOVE -> {
 
+                System.out.println(body.getMove());
+
                 if (!isUserInGame(authData.username(), body.getGameID())) {
                     sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Player not in game");
+                    return;
+                }
+
+                try {
+                    sampleGame.makeMove(body.getMove());
+                } catch (InvalidMoveException e) {
+                    sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Invalid Move or not your turn");
                     return;
                 }
 

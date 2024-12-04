@@ -37,6 +37,10 @@ public class UserGameCommand {
         RESIGN
     }
 
+    public ChessMove getMove() {
+        return move;
+    }
+
     public CommandType getCommandType() {
         return commandType;
     }
