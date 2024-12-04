@@ -2,14 +2,19 @@ package server;
 import com.google.gson.Gson;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import dataaccess.GameDAO;
+import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
 import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.messages.ServerMessage;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -62,6 +67,8 @@ public class WSServer {
             return;
         }
 
+        AuthData authData = authDAO.getAuthDataSQL(body.getAuthToken());
+
         if (!gameExists) {
             ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
             session.getRemote().sendString(new Gson().toJson(newMessage));
@@ -93,15 +100,28 @@ public class WSServer {
 
             case RESIGN -> {
 
+                if (!isUserInGame(authData.username(), body.getGameID())) {
+                    ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
+                    session.getRemote().sendString(new Gson().toJson(newMessage));
+                    return;
+                }
+
                 ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned!");
                 for (Session activeSession : activeSessions) {
                     activeSession.getRemote().sendString(new Gson().toJson(leaveMessage));
                 }
 
-                gameDAO.clearOneGame(body.getGameID());
+                clearOneGame(body.getGameID());
             }
 
             case MAKE_MOVE -> {
+
+                if (!isUserInGame(authData.username(), body.getGameID())) {
+                    ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Player not in game");
+                    session.getRemote().sendString(new Gson().toJson(newMessage));
+                    return;
+                }
+
                 ServerMessage loadMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Player has made a move");
                 for (Session activeSession : activeSessions) {
                     activeSession.getRemote().sendString(new Gson().toJson(loadMessage));
@@ -120,10 +140,42 @@ public class WSServer {
         }
     }
 
+    public boolean clearOneGame(int gameID) throws DataAccessException {
+        String sqlQuery = "DELETE FROM GameData WHERE gameID = ?";
 
-    private boolean confirmGameID() {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setInt(1, gameID);
+                preparedStatement.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean isUserInGame(String username, int gameID) throws DataAccessException {
+        String sqlQuery = "SELECT whiteUsername, blackUsername FROM GameData WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(sqlQuery)) {
+                preparedStatement.setInt(1, gameID);
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    if (Objects.equals(rs.getString("whiteUsername"), username) || Objects.equals(rs.getString("blackUsername"), username)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
         return false;
     }
+
 
     private static <T> T getBody(String message, Class<T> clazz) {
         var body = new Gson().fromJson(message, clazz);

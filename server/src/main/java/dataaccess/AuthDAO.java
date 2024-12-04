@@ -79,7 +79,6 @@ public class AuthDAO {
                 var rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     AuthData newData = new AuthData(rs.getString("authToken"), rs.getString("username"));
-                    System.out.println(newData);
                     return newData;
                 } else {
                     return null;
