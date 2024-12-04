@@ -12,8 +12,6 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.messages.ServerMessage;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -96,6 +94,7 @@ public class WSServer {
                     }
                 }
                 activeSessions.remove(session);
+                leaveGame(authData.username(), body.getGameID());
             }
 
             case RESIGN -> {
@@ -135,7 +134,6 @@ public class WSServer {
                     }
                 }
 
-
             }
         }
     }
@@ -153,6 +151,26 @@ public class WSServer {
             return false;
         }
     }
+
+    public boolean leaveGame(String username, int gameID) throws DataAccessException {
+        String sqlQuery = "UPDATE GameData " +
+                "SET whiteUsername = CASE WHEN whiteUsername = ? THEN NULL ELSE whiteUsername END, " +
+                "    blackUsername = CASE WHEN blackUsername = ? THEN NULL ELSE blackUsername END " +
+                "WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(sqlQuery)) {
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, username);
+            preparedStatement.setInt(3, gameID);
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     public boolean isUserInGame(String username, int gameID) throws DataAccessException {
         String sqlQuery = "SELECT whiteUsername, blackUsername FROM GameData WHERE gameID = ?";
