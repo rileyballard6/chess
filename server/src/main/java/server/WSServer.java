@@ -11,6 +11,7 @@ import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Set;
@@ -60,39 +61,35 @@ public class WSServer {
         boolean gameExists = gameDAO.gameExistsSQL(body.getGameID());
 
         if (!authExists) {
-            ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Auth does not exist");
-            session.getRemote().sendString(new Gson().toJson(newMessage));
+            sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Auth invalid");
             return;
         }
 
         AuthData authData = authDAO.getAuthDataSQL(body.getAuthToken());
 
         if (!gameExists) {
-            ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
-            session.getRemote().sendString(new Gson().toJson(newMessage));
+            sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Game invalid");
             return;
         }
 
         switch (body.getCommandType()) {
             case CONNECT -> {
 
-                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
-                session.getRemote().sendString(new Gson().toJson(newMessage));
+                sendMessage(session, ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
 
-                ServerMessage joinMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "A new player has joined");
                 for (Session activeSession : activeSessions) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
-                        activeSession.getRemote().sendString(new Gson().toJson(joinMessage));
+                        sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "New Player joined game");
                     }
                 }
             }
             case LEAVE -> {
-                ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Player has left the game");
                 for (Session activeSession : activeSessions) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
-                        activeSession.getRemote().sendString(new Gson().toJson(leaveMessage));
+                        sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Player left game");
                     }
                 }
+
                 activeSessions.remove(session);
                 leaveGame(authData.username(), body.getGameID());
             }
@@ -100,14 +97,12 @@ public class WSServer {
             case RESIGN -> {
 
                 if (!isUserInGame(authData.username(), body.getGameID())) {
-                    ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game does not exist");
-                    session.getRemote().sendString(new Gson().toJson(newMessage));
+                    sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Game does not exist");
                     return;
                 }
 
-                ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned!");
                 for (Session activeSession : activeSessions) {
-                    activeSession.getRemote().sendString(new Gson().toJson(leaveMessage));
+                    sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned");
                 }
 
                 clearOneGame(body.getGameID());
@@ -116,26 +111,27 @@ public class WSServer {
             case MAKE_MOVE -> {
 
                 if (!isUserInGame(authData.username(), body.getGameID())) {
-                    ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Player not in game");
-                    session.getRemote().sendString(new Gson().toJson(newMessage));
+                    sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Player not in game");
                     return;
                 }
 
-                ServerMessage loadMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Player has made a move");
                 for (Session activeSession : activeSessions) {
-                    activeSession.getRemote().sendString(new Gson().toJson(loadMessage));
+                    sendMessage(activeSession, ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
                 }
-
-                ServerMessage newMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This is a notification");
 
                 for (Session activeSession : activeSessions) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
-                        activeSession.getRemote().sendString(new Gson().toJson(newMessage));
+                        sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Notification");
                     }
                 }
 
             }
         }
+    }
+
+    private void sendMessage(Session session, ServerMessage.ServerMessageType messageType, String message) throws IOException {
+        ServerMessage messageToSend = new ServerMessage(messageType, message);
+        session.getRemote().sendString(new Gson().toJson(messageToSend));
     }
 
     public boolean clearOneGame(int gameID) throws DataAccessException {
