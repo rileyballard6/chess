@@ -8,6 +8,7 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.GameDAO;
 import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -48,9 +49,7 @@ public class WSServer {
     public void onConnect(Session session) {
         activeSessions.add(session);
         System.out.println("New connection added");
-        if (sampleGame == null) {
-            sampleGame = new ChessGame();
-        }
+        sampleGame = new ChessGame();
     }
 
     @OnWebSocketClose
@@ -123,7 +122,13 @@ public class WSServer {
                     return;
                 }
 
+                if (getTeamColor(authData.username(), body.getGameID()) != sampleGame.getTeamTurn()) {
+                    sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Not your turn");
+                    return;
+                }
+
                 try {
+                    System.out.println("Team turn: " + sampleGame.getTeamTurn());
                     sampleGame.makeMove(body.getMove());
                 } catch (InvalidMoveException e) {
                     sendMessage(session, ServerMessage.ServerMessageType.ERROR, "Invalid Move or not your turn");
@@ -177,10 +182,35 @@ public class WSServer {
             int rowsAffected = preparedStatement.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
             return false;
         }
     }
+
+    public ChessGame.TeamColor getTeamColor(String username, int gameID) throws DataAccessException {
+        String sqlQuery = "SELECT whiteUsername, blackUsername FROM GameData WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(sqlQuery)) {
+            preparedStatement.setInt(1, gameID);
+
+            try (var resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String whiteUsername = resultSet.getString("whiteUsername");
+                    String blackUsername = resultSet.getString("blackUsername");
+
+                    if (username.equals(whiteUsername)) {
+                        return ChessGame.TeamColor.WHITE;
+                    } else if (username.equals(blackUsername)) {
+                        return ChessGame.TeamColor.BLACK;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            return null;
+        }
+        return null;
+    }
+
 
 
     public boolean isUserInGame(String username, int gameID) throws DataAccessException {
@@ -199,7 +229,6 @@ public class WSServer {
                 }
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             return false;
         }
         return false;
