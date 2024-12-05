@@ -29,13 +29,10 @@ public class WSServer {
 
 
     public static void main(String[] args) {
-        new Server().run(8080);
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
-        Spark.staticFiles.location("web");
 
         Spark.webSocket("/ws", WSServer.class);
         Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
