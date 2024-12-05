@@ -58,6 +58,7 @@ public class WSServer {
         System.out.println("Connection closed");
     }
 
+    // Main method to calculate which message to send back to the client
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         var body = getBody(message, websocket.commands.UserGameCommand.class);
@@ -149,11 +150,13 @@ public class WSServer {
         }
     }
 
+    //Helper function to send the message
     private void sendMessage(Session session, ServerMessage.ServerMessageType messageType, String message) throws IOException {
         ServerMessage messageToSend = new ServerMessage(messageType, message);
         session.getRemote().sendString(new Gson().toJson(messageToSend));
     }
 
+    //Clears the game from the database
     public boolean clearOneGame(int gameID) throws DataAccessException {
         String sqlQuery = "DELETE FROM GameData WHERE gameID = ?";
 
@@ -167,7 +170,7 @@ public class WSServer {
             return false;
         }
     }
-
+    // Removes a user from game in the database
     public boolean leaveGame(String username, int gameID) throws DataAccessException {
         String sqlQuery = "UPDATE GameData " +
                 "SET whiteUsername = CASE WHEN whiteUsername = ? THEN NULL ELSE whiteUsername END, " +
@@ -186,6 +189,7 @@ public class WSServer {
         }
     }
 
+    //Gets what team the player is on based on their username and gameID
     public ChessGame.TeamColor getTeamColor(String username, int gameID) throws DataAccessException {
         String sqlQuery = "SELECT whiteUsername, blackUsername FROM GameData WHERE gameID = ?";
 
@@ -212,7 +216,7 @@ public class WSServer {
     }
 
 
-
+    //Checks to make sure a user is actually in a game
     public boolean isUserInGame(String username, int gameID) throws DataAccessException {
         String sqlQuery = "SELECT whiteUsername, blackUsername FROM GameData WHERE gameID = ?";
 
@@ -234,7 +238,7 @@ public class WSServer {
         return false;
     }
 
-
+    //Get the body from WS message
     private static <T> T getBody(String message, Class<T> clazz) {
         var body = new Gson().fromJson(message, clazz);
         if (body == null) {
