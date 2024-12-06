@@ -8,7 +8,6 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.GameDAO;
 import model.AuthData;
-import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import spark.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -16,13 +15,11 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.*;
 
 @WebSocket
 public class WSServer {
-    private static final Set<Session> ACTIVE_SESSIONS = new CopyOnWriteArraySet<>();
+    private static final Map<Integer, Set<Session>> GAME_SESSSIONS = new HashMap<>();
     private AuthDAO authDAO = new AuthDAO();
     private GameDAO gameDAO = new GameDAO();
     private ChessGame sampleGame = null;
@@ -44,21 +41,23 @@ public class WSServer {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        ACTIVE_SESSIONS.add(session);
         System.out.println("New connection added");
         sampleGame = new ChessGame();
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        ACTIVE_SESSIONS.remove(session);
+        removeSession(session);
         System.out.println("Connection closed");
     }
 
     // Main method to calculate which message to send back to the client
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
+
         var body = getBody(message, websocket.commands.UserGameCommand.class);
+
+        addSessionToGame(body.getGameID(), session);
 
         boolean authExists = authDAO.findAuthSQL(body.getAuthToken());
         boolean gameExists = gameDAO.gameExistsSQL(body.getGameID());
@@ -75,25 +74,28 @@ public class WSServer {
             return;
         }
 
+        Set<Session> sessions = GAME_SESSSIONS.computeIfAbsent(body.getGameID(), k -> new HashSet<>());
+
         switch (body.getCommandType()) {
             case CONNECT -> {
 
                 sendMessage(session, ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
 
-                for (Session activeSession : ACTIVE_SESSIONS) {
+                for (Session activeSession : sessions) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
                         sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "New Player joined game");
                     }
                 }
             }
             case LEAVE -> {
-                for (Session activeSession : ACTIVE_SESSIONS) {
+                for (Session activeSession : sessions) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
                         sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Player left game");
                     }
                 }
 
-                ACTIVE_SESSIONS.remove(session);
+                removeSession(session);
+
                 leaveGame(authData.username(), body.getGameID());
             }
 
@@ -104,7 +106,7 @@ public class WSServer {
                     return;
                 }
 
-                for (Session activeSession : ACTIVE_SESSIONS) {
+                for (Session activeSession : sessions) {
                     sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Player has resigned");
                 }
 
@@ -133,11 +135,11 @@ public class WSServer {
                     return;
                 }
 
-                for (Session activeSession : ACTIVE_SESSIONS) {
+                for (Session activeSession : sessions) {
                     sendMessage(activeSession, ServerMessage.ServerMessageType.LOAD_GAME, "Game loaded");
                 }
 
-                for (Session activeSession : ACTIVE_SESSIONS) {
+                for (Session activeSession : sessions) {
                     if (!activeSession.equals(session) && activeSession.isOpen()) {
                         sendMessage(activeSession, ServerMessage.ServerMessageType.NOTIFICATION, "Notification");
                     }
@@ -145,6 +147,33 @@ public class WSServer {
 
             }
         }
+    }
+
+    //Loops through the map to find the session and removes it
+    public void removeSession(Session session) {
+        Iterator<Map.Entry<Integer, Set<Session>>> iterator = GAME_SESSSIONS.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Set<Session>> entry = iterator.next();
+            Set<Session> sessions = entry.getValue();
+
+            if (sessions.contains(session)) {
+                sessions.remove(session);
+
+                if (sessions.isEmpty()) {
+                    iterator.remove();
+                }
+
+                break;
+            }
+        }
+    }
+
+    //Adds a session to a game, or creates a new set based on the gameID
+    public void addSessionToGame(int gameID, Session session) {
+        Set<Session> sessions = GAME_SESSSIONS.computeIfAbsent(gameID, k -> new HashSet<>());
+
+        sessions.add(session);
     }
 
     //Helper function to send the message
